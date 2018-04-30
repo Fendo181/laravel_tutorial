@@ -15,3 +15,7 @@ Route::get('/', function () {
     $links = \App\Link::all();
     return view('welcome',['links'=> $links]);
 });
+
+Route::get('/submit', function () {
+    return view('submit');
+});
