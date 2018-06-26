@@ -88,6 +88,11 @@
                         <a href="{{ $link->url }}">{{ $link->title }}</a>
                     @endforeach
                 </div>
+
+                {{-- comment here --}}
+                <div class="comment">
+                    <a href="./submit">cooment here</a>
+                </div>
             </div>
         </div>
     </body>
