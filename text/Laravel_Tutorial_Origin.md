@@ -39,7 +39,7 @@ _※フォーチュン500（Fortune 500）は、アメリカ合衆国のフォ�
 - **ローカルPHP環境（Valet, Homestead, Vagrant, MAMP, etc.）。**
 - **データベース。私はMySQLを使用します。**
 - **PHPUnitがインストールされている。**
-- **ノードがインストールされている。**
+- **Nodeがインストールされている。**
 
 
 >Note: For the local PHP environment I am using a Mac and like to use Valet because it automatically sets up everything. If you are on Windows, you should consider Homestead or some flavor of a virtual machine.
@@ -56,7 +56,7 @@ _※フォーチュン500（Fortune 500）は、アメリカ合衆国のフォ�
 
 >Every project has to start from somewhere, either assigned to you by your work or just an idea in your head. No matter where it originates, thoroughly planning out all the features before you start coding is paramount in completing a project.
 
-**どのプロジェクトも、仕事によって割り当てられたか、もしくは頭の中のアイデアから始まります。最初がどうであれコーディングを開始する前にすべての機能を計画しておくことが、プロジェクトを完了する上で最も重要です。**
+**どんなプロジェクトでも、仕事によって割り当てられたか、もしくは頭の中のアイデアから始まります。最初がどうであれコーディングを開始する前にすべての機能を計画しておくことが、プロジェクトを完了する上で最も重要です。**
 
 >How you plan is dependent on how your mind works. As a visual person, I like to plan on paper, drawing out the way I picture the screens looking and then working backward into how I’d code it out. Others prefer to write a project plan in a text file, wiki, or some mind mapping tool. It doesn’t matter how you plan, just that you do it.
 
@@ -67,10 +67,10 @@ _※フォーチュン500（Fortune 500）は、アメリカ合衆国のフォ�
 
 **このガイドでは、リンクディレクトリを構築する予定です。 このリンクアプリの基本的な目標リストは次のとおりです：**
 
-- **1.簡単なリンクリストを表示します。**
-- **2.新しいリンクを提出できるフォームを作成します。**
+- **1.簡単なリンクリストを表示する。**
+- **2.新しいリンクを投稿できるフォームを作成する。**
 - **3.フォームを検証する**
-- **4.データをデータベースに保存します。**
+- **4.データをデータベースに保存する。**
 
 ## **最初のステップ**
 
@@ -83,33 +83,47 @@ _※フォーチュン500（Fortune 500）は、アメリカ合衆国のフォ�
 **ターミナルアプリケーションを開き、このディレクトリに切り替えます。**
 
 
-```
-
-cd ~/Sites
-
+```bash
+ccd ~/Sites
 ```
 
 >Next, install Laravel’s command line installer:
 
 **次に、Laravelのインストーラをインストールします。**
 
-```
+```bash
 composer global require "laravel/installer"
 
 ```
 
->Once that finishes you can create the project by running:
+>You need to make sure that the global Composer bin is in your path. You can do so by adding the following to your PATH in your ~/.bash_profile or ~/.zshrc if you are using Z shell:
 
-**完了したら、次のコマンドを実行してプロジェクトを作成できます。**
+**インストールしたComposerがPATHに含まれていることを確認する必要があります。`~/.bash_profile`または zシェルを使っている場合は `~/.zshrc` のPATHに次の行を追加してください。**
 
+```bash
+export PATH="$HOME/.composer/vendor/bin:$PATH"
 ```
+
+>For the path to take effect, you need to restart your terminal session of source the file again:
+
+**追加したパスを有効化させるために、再度terminal上で`source`コマンドを実行します。**
+
+```bash
+source ~/.bash_profile
+```
+
+>Now you can use the Laravel installer to create new projects from the command line:
+
+**これで、Laravelインストーラを使ってコマンドライン上から新しいプロジェクトを作成することができます。**
+
+```bash
 laravel new links
 ```
 
 
->This will create a new directory named “links” and install an empty Laravel project. Visiting “links.dev” in the browser now shows the default Laravel welcome page:
-
-**これにより、 "links"という名前の新しいディレクトリが作成され、空のLaravelプロジェクトがインストールされます。 ブラウザーの "links.dev"を訪れると、デフォルトのLaravelのwelcomeページが表示されます：**
+>This will create a new directory at ~/Sites/links and install an stock Laravel project. Visiting links.dev in the browser now shows the default Laravel welcome page:
+ 
+**新しく`~/Sites/links`ディレクトリが作られ、Laravelプロジェクトがインストールされています。 ブラウザーの "links.dev"を訪れると、デフォルトのLaravelのwelcomeページが表示されます：**
 
 ![laravel.png](https://qiita-image-store.s3.amazonaws.com/0/64829/6d3a23c6-a177-2482-3c08-e019ad883f1f.png)
 
@@ -117,16 +131,16 @@ laravel new links
 
 >Now scaffold out the authentication system by running
 
-**以下のコマンドを実行して認証システムの土台を作りましょう。**
+**次のコマンドを実行して認証システムの土台を作りましょう。**
 
-```
+```bash
 php artisan make:auth
 ```
 
 
 >Even though this tutorial will not dive into authentication by running this command, it will modify our views and routes. So by doing it early, we don’t have to worry about it messing with any of our code.
 
-**このチュートリアルでは、認証を行うことはありませんが、上のコマンドを実行する事でビューとルートが変更されます。従って早期に行うことで、コードを乱れる心配をせずに済みます。**
+**このチュートリアルでは、認証を行うことはありませんが、上のコマンドを実行する事でビューとルートが変更されます。従って早い段階で実行する事で、コードが乱れる心配をせずに済みます。**
 
 >With the basics setup and working it’s time to start doing some coding.
 
@@ -138,7 +152,7 @@ php artisan make:auth
 >If you start thinking about the whole finished project, it’s easy to get overwhelmed. The best way to fight this is to break everything down into small tasks. So, let’s start with showing a list of links.
 
 
-**完成したプロジェクト全体について考え始めるなら、圧倒されるのは当然です。 これと戦う最善の方法は、すべて小さな仕事に分割することです。 まずはリンクのリストを表示することから始めましょう。**
+**完成したプロジェクト全体について考え始めたとしたら、圧倒されるのは当然です。 これと戦う最善の方法は、すべて小さな仕事に分割することです。 まずはリンクのリストを表示することから始めましょう。**
 
 
 >Even though showing a list of links sounds like a small task it still requires a database, a database table, data in the table, a database query, and a view file.
@@ -149,13 +163,13 @@ php artisan make:auth
 
 **マイグレーションファイルを作成することが最初のステップとなり、Laravel Artisanコマンドラインツールがその作成に役立ちます。**
 
-```php
+```bash
 php artisan make:migration create_links_table --create=links
 ```
 
 >Now, open the file this command created. It will be located at database/migrations/{{datetime}}_create_links_table.php
 
-**次にこのコマンドで作成したファイルを開きます。 ファイルは`database / migrations / {{datetime}} _ create_links_table.php`にあります。**
+**次にこのコマンドで作成したファイルを開きます。 ファイルは`database/migrations/{{datetime}}_create_links_table.php`にあります。**
 
 
 >Inside the up method add our new columns:
@@ -175,6 +189,9 @@ Schema::create('links', function (Blueprint $table) {
 
 **ファイルを保存して、マイグレーションを実行します。**
 
+```bash
+php artisan migrae
+```
 
 
 >Now we need to enter some data and Laravel provides two features that help with this. The first is database seeds and model factories. But before we can use those we will need a model which can be generated like this:
