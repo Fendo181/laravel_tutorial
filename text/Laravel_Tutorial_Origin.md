@@ -3,7 +3,6 @@
 この記事は [Step by Step Guide to Building Your First Laravel Application](https://laravel-news.com/your-first-laravel-application)を翻訳したチュートリアル記事です。日本語の翻訳ならびに、記事の公開、コードの引用は製作者である[Eric L. Barnes](https://twitter.com/ericlbarnes)氏に既に許可を取ってあります。
 
 
-
 Thank you for making great tutorial articles!
 
 ※追記
