@@ -151,7 +151,7 @@ php artisan make:auth
 >If you start thinking about the whole finished project, it’s easy to get overwhelmed. The best way to fight this is to break everything down into small tasks. So, let’s start with showing a list of links.
 
 
-**完成したプロジェクト全体について考え始めたとしたら、圧倒されるのは当然です。 これと戦う最善の方法は、すべて小さな仕事に分割することです。 まずはリンクのリストを表示することから始めましょう。**
+**完成したプロジェクト全体について考え始めたとしたら、圧倒されるのは当然です。 これに取り組む最善の方法は、すべて小さな仕事に分割することです。 まずはリンクのリストを表示することから始めましょう。**
 
 
 >Even though showing a list of links sounds like a small task it still requires a database, a database table, data in the table, a database query, and a view file.
@@ -192,45 +192,76 @@ Schema::create('links', function (Blueprint $table) {
 php artisan migrae
 ```
 
+>While you are working with test data, you can quickly apply the schema:
 
->Now we need to enter some data and Laravel provides two features that help with this. The first is database seeds and model factories. But before we can use those we will need a model which can be generated like this:
+**一方でテストデータを実行するために、以下のコマンドを実行する事で素早く実行できる**
 
-**ここでいくつかのテストデータを入力する必要があり、Laravelはこれを助ける2つの機能を提供します。 データベースシードとモデルファクトリです。 しかし、それらを使用する前に、次のように生成できるモデルが必要になります。**
-
+```bash
+php artisan migrate:fresh
 ```
-php artisan make:model Link
+
+
+>Next, we need some data and a model to work with our database table. Laravel provides two features which help with this: the first is a database seeder, which populates the database with data, and second, the model factory files that allow us to generate fake model data that we can use to fill our development database and tests:
+
+**次に、DBのtableからいくつかのデータとそれを扱うモデルが必要です。Laravelはこれを助ける2つの機能を提供します。 1つめはデータベースシードでこの機能はDBにデータを登録させる事ができます。2つめはモデルファクトリーで、この機能を使う事で開発用のDBに偽のモデルデータを生成する事ができます。**
+
+```bash
+php artisan make:model --factory Link
 ```
 
->Open the ModelFactory.php file and let’s add one for the links table:
+>The `--factory` flag will generate a new factory file in the `database/factories` path, in our case a new `LinkFactory` file will include an empty factory definition for our Link model.
 
-**ModelFactory.phpを開き、リンクテーブルにファイルを追加しましょう。**
+**`--factory`フラグは`database/factories`に新しいファクトリーを生成し、今回のケースでは`LinkFactory`を生成されリンクモデルの空のファクトリ定義が含まれます。**
+
+
+>Open the LinkFactory.php file and fill in the following:
+
+**LinkFactory.phpを開き、次の情報を入力します。**
 
 ```php
-$factory->define(App\Link::class, function (Faker\Generator $faker) {
+<?php
+
+use Faker\Generator as Faker;
+
+/* @var Illuminate\Database\Eloquent\Factory $factory */
+
+$factory->define(App\Link::class, function (Faker $faker) {
     return [
-        'title' => $faker->name,
+        'title' => substr($faker->sentence(2), 0, -1),
         'url' => $faker->url,
         'description' => $faker->paragraph,
     ];
 });
-
 ```
+
+>We use the $faker->sentence() method to generate a title, and substr to remove the period at the end of the sentence.
+
+**`$faker->sentence()`メソッドを使う事でテストデータのイトルを生成し、`substr`で文末のピリオドを削除します。**
 
 
 >Next, create the link seeder, so we can easily add demo data to the table:
 
-**次に、テストデータをテーブルに簡単に追加できるようにlink seederを作成します。**
+**次に、テストデータをテーブルに簡単に追加できるように`link seeder`を作成します。**
 
-```
+```bash
 php artisan make:seeder LinksTableSeeder
 
 ```
 
+>The make:seeder command generates a new database seeder class to seed our links table. Open the database/seeds/LinksTableSeeder.php file and add the following:
 
->Open the LinksTableSeeder.php file that was just created, and in the run method we will utilize the links model factory we created above:
+**`make:seeder`コマンドは新しいデータベースシーダクラスを生成して、リンクテーブル用の初期値設定を行います。`database/seeds/LinksTableSeeder.php`を開いて次に以下のようにコードを追加して下さい。**
 
-**作成したばかりのLinksTableSeeder.phpファイルを開き、runメソッドで上記で作成したリンクモデルファクトリを使用します：**
+```php
+public function run()
+{
+    factory(App\Link::class, 5)->create();
+}
+```
 
+>In order to “activate” the LinksTableSeeder, we need to call it from the main database/seeds/DatabaseSeeder.php run method:
+
+**LinksTableSeederを"有効化"するために`database/seeds/LinksTableSeeder.php `の`run`メソッド内で`call`を実行する必要があります。**
 
 ```php
 public function run()
