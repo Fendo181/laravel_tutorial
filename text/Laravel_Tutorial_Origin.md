@@ -19,7 +19,7 @@ ___
 
 >Since its initial release in 2011, Laravel has experienced exponential growth. In 2015, it became the most starred PHP framework on GitHub and rose to the go-to framework for people all over the world.
 
-**2011年の最初のリリース以来、Laravelは急激な成長を経験してきました。 2015年には、LaravelはGithubでもっとも花形のPHPフレームワークになり、世界中の人々のための頼りになるフレームワークになるまで出世しました。**
+**2011年の最初のリリース以来、Laravelは急激な成長を経験してきました。2015年には、LaravelはGithubでもっとも人気のあるPHPフレームワークになり、世界中の人々のための頼りになるフレームワークになるまで出世しました。**
 
 >Laravel focuses on you, the end user, first which means its focus is on simplicity, clarity, and getting work done. People and companies are using it to build everything from simple hobby projects all the way to Fortune 500 companies.
 
@@ -194,7 +194,7 @@ php artisan migrae
 
 >While you are working with test data, you can quickly apply the schema:
 
-**一方でテストデータを実行するために、以下のコマンドを実行する事で素早く実行できる**
+**テストデータ生成する一方で、以下のコマンドを実行する事で素早くなかった事にする事ができます。**
 
 ```bash
 php artisan migrate:fresh
@@ -236,7 +236,7 @@ $factory->define(App\Link::class, function (Faker $faker) {
 
 >We use the $faker->sentence() method to generate a title, and substr to remove the period at the end of the sentence.
 
-**`$faker->sentence()`メソッドを使う事でテストデータのイトルを生成し、`substr`で文末のピリオドを削除します。**
+**`$faker->sentence()`メソッドを使う事でタイトルのテストデータを生成し、`substr`で文末のピリオドを削除します。**
 
 
 >Next, create the link seeder, so we can easily add demo data to the table:
@@ -250,7 +250,7 @@ php artisan make:seeder LinksTableSeeder
 
 >The make:seeder command generates a new database seeder class to seed our links table. Open the database/seeds/LinksTableSeeder.php file and add the following:
 
-**`make:seeder`コマンドは新しいデータベースシーダクラスを生成して、リンクテーブル用の初期値設定を行います。`database/seeds/LinksTableSeeder.php`を開いて次に以下のようにコードを追加して下さい。**
+**`make:seeder`コマンドは新しいデータベースシーダクラスを生成して、リンクテーブル用の初期値設定を行います。`database/seeds/LinksTableSeeder.php`を開いて以下のようにコードを追加して下さい。**
 
 ```php
 public function run()
@@ -261,42 +261,66 @@ public function run()
 
 >In order to “activate” the LinksTableSeeder, we need to call it from the main database/seeds/DatabaseSeeder.php run method:
 
-**LinksTableSeederを"有効化"するために`database/seeds/LinksTableSeeder.php `の`run`メソッド内で`call`を実行する必要があります。**
+**LinksTableSeederを"有効化"するために`database/seeds/LinksTableSeeder.php `の`run`メソッド内でを呼び出す必要があります。**
 
 ```php
 public function run()
 {
-    factory(App\Link::class, 10)->create();
+    $this->call(LinksTableSeeder::class);
 }
 ```
 
->Open the DatabaseSeeder.php and add this to the run method:
+>You can now run the migrations and seeds to add data to the table automatically. Using the migrate:fresh command, we can get a clean schema that applies all migrations and then seeds the database:
 
-**DatabaseSeeder.phpを開き、runメソッドに追加します：**
-
-
-```php
-$this->call(LinksTableSeeder::class);
-```
-
-
->You can now run the migrations and seeds to automatically add data to the table:
-
-
-**以下のコマンドでマイグレーションとシードを実行して、テーブルに自動的にテストデータを追加することができます。**
+**以下のコマンドでマイグレーションとシードを実行して、テーブルに自動的にテストデータを追加することができます。hoge**
 
 
 ```php
-php artisan migrate --seed
+$ php artisan migrate:fresh --seed
+Dropped all tables successfully.
+Migration table created successfully.
+Migrating: 2014_10_12_000000_create_users_table
+Migrated:  2014_10_12_000000_create_users_table
+Migrating: 2014_10_12_100000_create_password_resets_table
+Migrated:  2014_10_12_100000_create_password_resets_table
+Migrating: 2017_11_03_023418_create_links_table
+Migrated:  2017_11_03_023418_create_links_table
+Seeding: LinksTableSeeder
 ```
 
 
+>Using the tinker shell you can start playing around with the model data:
 
-## ルーティングとビュー
+**hoge**
 
->To build out a view showing the list of links first open the routes/web.php file and you should see the default route below:
+```php
+>>> \App\Link::first();
+=> App\Link {#747
+     id: 1,
+     title: "Aliquam quo pariatur",
+     url: "https://gibson.com/consequuntur-consequatur-eius-expedita-maiores-quaerat-occaecati.html",
+     description: "Temporibus eaque aspernatur...",
+     created_at: "2017-11-04 05:35:45",
+     updated_at: "2017-11-04 05:35:45",
+   }
+>>>
+```
 
-**リンクのリストを表示するビューを構築するには、最初にroutes / web.phpファイルを開き、以下のデフォルトルートが表示されるはずです：**
+>We have the data place and a model to interact with the database. We are now ready to start building the UI to add new links to the application.
+
+**hoge**
+
+
+## **ルーティングとビュー**
+
+>To build out a view showing the list of links, we need to update the main project route and also define a new route that will display our submission form. We can add new routes to our application in the routes/web.php file.
+
+**hoge**
+
+>In the web routes file you should see the default route below:
+
+**hoge**
+
 
 
 ```php
@@ -305,10 +329,14 @@ Route::get('/', function () {
 });
 ```
 
->Laravel provides us two options at this point. We can either add our code additions directly to the route closure, where the “return view..” is, or we can move the code to a controller. For simplicity let’s add our needed code to fetch the links directory in the closure.
+>To create a new route we can either use a route closure or a dedicated controller class. In this tutorial, we will use closures for our submission and index routes.
 
+**hoge**
 
-**この時点で、Laravelは2つのオプションを提供します。 "return view.."と言う処理をroute closure内に直接追加することができ、またはこの処理をコントローラーに移動する事もできます。 簡単にするために、closure内のリンクディレクトリを取得するためのコードを追加してみましょう。**
+>First, let’s update the home route by getting a collection of links from the database and passing them to the view:
+ 
+
+**hoge**
 
 
 ```php
@@ -318,6 +346,22 @@ Route::get('/', function () {
     return view('welcome', ['links' => $links]);
 });
 
+```
+
+>The second argument can be an associative array of data, and the key ends up being the variable name in the template file.
+
+**hoge**
+
+>You can also use a fluent API to define variables if you prefer:
+
+**hoge**
+
+```php
+// with()
+return view('welcome')->with('links', $links);
+
+// dynamic method to name the variable
+return view('welcome')->withLinks($links);
 ```
 
 >Next, edit the welcome.blade.php file and add a simple foreach to show all the links:
@@ -332,6 +376,39 @@ Route::get('/', function () {
 
 ```
 
+>Here’s what the welcome.blade.php HTML should look like:
+
+**hoge**
+
+```html
+<body>
+    <div class="flex-center position-ref full-height">
+        @if (Route::has('login'))
+            <div class="top-right links">
+                @auth
+                    <a href="{{ url('/home') }}">Home</a>
+                @else
+                    <a href="{{ route('login') }}">Login</a>
+                    <a href="{{ route('register') }}">Register</a>
+                @endauth
+            </div>
+        @endif
+
+        <div class="content">
+            <div class="title m-b-md">
+                Laravel
+            </div>
+
+            <div class="links">
+                @foreach ($links as $link)
+                    <a href="{{ $link->url }}">{{ $link->title }}</a>
+                @endforeach
+            </div>
+        </div>
+    </div>
+</body>
+```
+
 >If you refresh your browser, you should now see the list of all the links added. With that all set, let’s move to submitting links.
 
 **ブラウザを更新すると、追加されたすべてのリンクのリストが表示されます。 準備が整ったので、リンクを追加するフォームを加えてみましょう。**
@@ -340,11 +417,13 @@ Route::get('/', function () {
 
 
 
-## リンクの送信
+## **リンクの送信フォームの作成**
 
->The next major feature is the ability for others to submit links into the app. This will require three fields: title, URL, and a description.
+>We are almost done creating our first application in Laravel. We will round out this Laravel tutorial with the ability for others to submit links into the app, which requires three fields: title, URL, and a description.
 
-**次の実装する大きな機能は、フォームからリンクをアプリに追加できるようにする事です。 これには、タイトル、URL、説明の3つのフィールドが必要です。**
+**hoge**
+(次の実装する大きな機能は、フォームからリンクをアプリに追加できるようにする事です。 これには、タイトル、URL、説明の3つのフィールドが必要です。)
+
 
 >I am a visual person and before planning out features that will require HTML I like to draw them out so I can get an idea of what I’m building in my head. Here is a simple drawing of this form:
 
@@ -353,8 +432,6 @@ Route::get('/', function () {
 _※この絵は[元の絵](https://i2.wp.com/wp.laravel-news.com/wp-content/uploads/2016/03/form-drawing.jpg?resize=768%2C857)を参考にして私自身が書きました。_
 
 ![laravel_mock.png](https://qiita-image-store.s3.amazonaws.com/0/64829/936e0d41-4504-85ab-caec-8d7952045123.png)
-
-
 
 
 
@@ -371,81 +448,549 @@ _※この絵は[元の絵](https://i2.wp.com/wp.laravel-news.com/wp-content/upl
     return view('submit');
 });
 ```
- 
- >We will also need this view file so we can go ahead and create it at resources/views/submit.blade.php and add the following boilerplate bootstrap code:
+
+>Next, we need to create the submit.blade.php template at resources/views/submit.blade.php with the following boilerplate bootstrap markup:
  
 
+**hoge**
 
-**投稿する為のビューファイルも必要ですので、`resources / views / submit.blade.php`に作成し、いつものBootstrapコードを追加してください**
- 
- ```php
- 
+```html
 @extends('layouts.app')
 @section('content')
     <div class="container">
         <div class="row">
             <h1>Submit a link</h1>
             <form action="/submit" method="post">
+                @if ($errors->any())
+                    <div class="alert alert-danger" role="alert">
+                        Please fix the following errors
+                    </div>
+                @endif
+
                 {!! csrf_field() !!}
-                <div class="form-group">
+                <div class="form-group{{ $errors->has('title') ? ' has-error' : '' }}">
                     <label for="title">Title</label>
-                    <input type="text" class="form-control" id="title" name="title" placeholder="Title">
+                    <input type="text" class="form-control" id="title" name="title" placeholder="Title" value="{{ old('title') }}">
+                    @if($errors->has('title'))
+                        <span class="help-block">{{ $errors->first('title') }}</span>
+                    @endif
                 </div>
-                <div class="form-group">
-                <label for="url">Url</label>
-                    <input type="text" class="form-control" id="url" name="url" placeholder="URL">
+                <div class="form-group{{ $errors->has('url') ? ' has-error' : '' }}">
+                    <label for="url">Url</label>
+                    <input type="text" class="form-control" id="url" name="url" placeholder="URL" value="{{ old('url') }}">
+                    @if($errors->has('url'))
+                        <span class="help-block">{{ $errors->first('url') }}</span>
+                    @endif
                 </div>
-                <div class="form-group">
+                <div class="form-group{{ $errors->has('description') ? ' has-error' : '' }}">
                     <label for="description">Description</label>
-                    <textarea class="form-control" id="description" name="description" placeholder="description"></textarea>
+                    <textarea class="form-control" id="description" name="description" placeholder="description">{{ old('description') }}</textarea>
+                    @if($errors->has('description'))
+                        <span class="help-block">{{ $errors->first('description') }}</span>
+                    @endif
                 </div>
                 <button type="submit" class="btn btn-default">Submit</button>
             </form>
         </div>
     </div>
 @endsection
- ```
- 
- 
- ![form.png](https://qiita-image-store.s3.amazonaws.com/0/64829/46dba030-3aac-0056-e07d-4a26a019bcb6.png)
+```
 
+>There’s quite a bit going on in this form, so let’s go over the major points that might be confusing when you are new to Laravel.
  
 
->Now, let’s create a route to handle the POST data and do our validation. Let’s create that route and add our validation rules in
+**hoge**
+
+
+>Near the top of the form, we have a blade conditional that checks to see if there are any validation errors. When errors exist, the bootstrap alert message will be shown, prompting the user to fix the invalid form fields:
+ 
+
+**hoge**
+
+
+```html
+@if ($errors->any())
+    <div class="alert alert-danger" role="alert">
+        Please fix the following errors
+    </div>
+@endif
+```
+
+
+>Each individual form field checks for validation errors and displays an error message and outputs a has-error class:
+ 
+**hoge**
+
+```html
+<div class="form-group{{ $errors->has('title') ? ' has-error' : '' }}">
+    <label for="title">Title</label>
+    <input type="text" class="form-control" id="title" name="title" placeholder="Title" value="{{ old('title') }}">
+    @if($errors->has('title'))
+        <span class="help-block">{{ $errors->first('title') }}</span>
+    @endif
+</div>
+```
+
+>If the user submits invalid data, the route will store validation in the session and redirect the user back to the form. The {{ old('title') }} function will populate the originally submitted data. If a user forgot to submit one of the fields, the other fields that have data would be populated after validation fails and errors are shown.
+ 
+**hoge**
+
+>If a field has an error, the first() method returns the first error for a given field:
+
+**hoge** 
+
+
+```html
+{{ $errors->first('title') }}
+```
 
 **次に、POSTデータを処理し、検証を行うルートを作成しましょう。 そのルートを作成してバリデーションルールを追加しましょう：**
  
- ```php
- use Illuminate\Http\Request;
  
- Route::post('/submit', function(Request $request) {
-    $validator = Validator::make($request->all(), [
+## **フォームを送信する**
+
+>With the form in place, we are ready to handle the POST data and validate data. Back in the routes/web.php file, create another route for the POST request:
+
+**hoge**
+
+ ```php
+use Illuminate\Http\Request;
+
+Route::post('/submit', function (Request $request) {
+    $data = $request->validate([
         'title' => 'required|max:255',
-        'url' => 'required|max:255',
+        'url' => 'required|url|max:255',
         'description' => 'required|max:255',
     ]);
-    if ($validator->fails()) {
-        return back()
-            ->withInput()
-            ->withErrors($validator);
-    }
-    $link = new \App\Link;
-    $link->title = $request->title;
-    $link->url = $request->url;
-    $link->description = $request->description;
-    $link->save();
+
+    $link = tap(new App\Link($data))->save();
+
     return redirect('/');
 });
-
 ```
  
- >This route is a little more complex than the others. First, we are injecting the Illuminate\Http\Request which will hold all of the POST data. Then, we create a new Validator instance with our rules. If this validation fails, it returns the user back with the original input data and with the validator errors.
+>This route is a little more complex than the others. 
 
-**このルートは、他のルートより少し複雑です。 まず、すべてのPOSTデータを保持する`Illuminate \ Http \ Request`を注入します。 次に、新しいValidatorインスタンスを作成します。 この検証に失敗すると、元の入力データとバリデーターエラーをユーザーに返します。**
+**このルートは、他のルートより少し複雑です。**
 
->Finally, if everything passed validation, we use the “App::Link” model to add the data.
 
-**最後に、すべてが検証に合格した場合、"App :: Link"モデルを使用してデータを追加します。**
+>First, we are injecting the Illuminate\Http\Request which will hold all of the POST data. Then, we create a new Validator instance with our rules. If this validation fails, it returns the user back with the original input data and with the validator errors.
+
+**まず、`Illuminate\Http\Request`を依存注入してPOSTで受け取ったデータを保持するようにします。 次に、新しいValidatorインスタンスを作成します。 この検証に失敗すると、元の入力データとバリデーターエラーをユーザーに返します。**
+
+>Next, we use the request’s validate() method to validate the form data. The validate method was introduced in Laravel 5.5 and is a nice shortcut over other methods used for validation. As a bonus, the validated fields are returned to the $data variable, and we can use them to populate our model.
+
+
+**hoge**
+
+>We require all three fields, and using the pipe character; we can define multiple rules. All three rules can have a max of 255 characters, and the url field requires a valid URL.
+
+**hoge**
+
+>If validation fails, an exception is thrown, and the route returns the user with the original input data and validation errors.
+ 
+**hoge**
+
+>Next, we use the tap() helper function to create a new Link model instance and then save it. Using tap allows us to call save() and still return the model instance after the save.
+
+**hoge**
+
+>Typically, you would have to do the following without tap, it just adds a little syntactic sugar:
+
+**hoge**
+
+>If we want to populate a new model with data, we need to allow the fields to be “fillable” via mass assignment. The fillable property is designed to prevent fields from being mass-assigned except for the items you define in the array.
+ 
+
+**hoge**
+
+>In our case, we are validating each field so allowing them to be mass-assigned is safe. To allow our model assign values to these fields, open the app/Link.php file and update it to look like the following:
+
+**hoge**
+
+```php
+<?php
+
+namespace App;
+
+use Illuminate\Database\Eloquent\Model;
+
+class Link extends Model
+{
+    protected $fillable = [
+        'title',
+        'url',
+        'description'
+    ];
+}
+```
+
+>If we wanted to prevent mass-assignment, this is how our code would look:
+
+```php
+$data = $request->validate([
+    'title' => 'required|max:255',
+    'url' => 'required|url|max:255',
+    'description' => 'required|max:255',
+]);
+
+$link = new \App\Link;
+$link->title = $data['title'];
+$link->url = $data['url'];
+$link->description = $data['description'];
+
+// Save the model
+$link->save();
+```
+
+
+>The last thing we do in our POST route redirects the user back to the home page after saving the link successfully.
+
+**hoge**
+
+
+## **フォーム送信処理のテスト**
+
+>Laravel makes HTTP testing a breeze for performing integration tests against routes and middleware, so let’s write a few feature tests to verify our code works as expected.
+
+**hoge**
+
+>Before we get started, we need to adjust a few things in our phpunit.xml file so that we can use an in-memory SQLite database. You will need to make sure that you have the proper PHP modules installed.
+
+**hoge**
+
+>Using environment variables, we can change the database connection by adding a few new variables to the config:
+
+**hoge**
+
+```php
+<php>
+        <!-- ... -->
+    <env name="DB_CONNECTION" value="sqlite"/>
+    <env name="DB_DATABASE" value=":memory:"/>
+        <!-- ... -->
+</php>
+```
+
+
+>Next, remove the placeholder test that ships with Laravel:
+
+```php
+rm tests/Feature/ExampleTest.php
+```
+
+>We are ready to start testing the /submit form through HTTP requests to make sure that the route validation, saving, and redirecting are working as expected.
+
+**hoge**
+
+>First, let’s create a new feature test to test against our route:
+
+**hoge**
+
+
+```bash
+php artisan make:test SubmitLinksTest
+```
+
+>The command creates a new testing file with the proper dependencies, including a RefreshDatabase trait that we are going to use to verify that our links are being saved to the database when valid.
+
+**hoge**
+
+>Open the new tests/Feature/SubmitLinksTest.php file and let’s define a few skeleton tests in the body of the class that we are going to flesh out:
+
+**hoge**
+
+```php
+/** @test */
+function guest_can_submit_a_new_link() {}
+
+/** @test */
+function link_is_not_created_if_validation_fails() {}
+
+/** @test */
+function link_is_not_created_with_an_invalid_url() {}
+
+/** @test */
+function max_length_fails_when_too_long() {}
+
+/** @test */
+function max_length_succeeds_when_under_max() {}
+
+```
+
+>These tests should give you a high-level overview of what we are going to test:
+
+**hoge**
+
+```
+1.Verify that valid links get saved in the database
+2.When validation fails, links are not in the database
+3.Invalid URLs are not allowed
+4.Validation should fail when the fields are longer than the max:255 validation rule
+5.Validation should succeed when the fields are long enough according to max:255.
+```
+
+>We might be missing some things, but for your first Laravel application, this is a decent list that should illustrate some basic HTTP testing techniques in Laravel.
+
+**hoge**
+
+## **リンクを保存する時のバリデーション処理のテスト**
+
+>The first test we’ll write is the test that verifies that valid data gets stored in the database:
+
+**hoge**
+
+```php
+<?php
+
+namespace Tests\Feature;
+
+use Illuminate\Validation\ValidationException;
+use Tests\TestCase;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+
+class SubmitLinksTest extends TestCase
+{
+    use RefreshDatabase;
+
+    /** @test */
+    function guest_can_submit_a_new_link()
+    {
+        $response = $this->post('/submit', [
+            'title' => 'Example Title',
+            'url' => 'http://example.com',
+            'description' => 'Example description.',
+        ]);
+
+        $this->assertDatabaseHas('links', [
+            'title' => 'Example Title'
+        ]);
+
+        $response
+            ->assertStatus(302)
+            ->assertHeader('Location', url('/'));
+
+        $this
+            ->get('/')
+            ->assertSee('Example Title');
+    }
+}
+```
+
+
+>Take note of the RefreshDatabase trait which makes sure that each test has a new database to give each test a pristine database environment with all the migrations.
+
+**hoge**
+
+>Our first test submits valid post data, which returns a response object that we can use to assert that our route responded as expected. We verify that the database contains a record with the title we just created.
+
+**hoge**
+
+>Next, we verify that the response was a 302 status code with a Location header pointing to the homepage.
+
+**hoge**
+
+>Last, we request the home page and verify that the link title is visible on the homepage.
+
+**hoge**
+
+## **フィールドのバリデーション処理のテスト**
+
+>When a user generally submits bad data, we expect the validation to trigger an exception and we can use that to make sure our validation layer is working:
+
+**hoge**
+
+```php
+/** @test */
+function link_is_not_created_if_validation_fails()
+{
+    $response = $this->post('/submit');
+
+    $response->assertSessionHasErrors(['title', 'url', 'description']);
+}
+```
+
+>We use Laravel’s assertSessionHasErrors() to make sure that the session has validation errors for each of our required fields. Because we submitted empty data to the route, we expect the required rule will trigger for each field.
+ 
+**hoge**
+
+>Let’s run the test suite to verify our work thus far:
+
+**hoge**
+
+
+```bash
+$ vendor/bin/phpunit
+PHPUnit 6.4.3 by Sebastian Bergmann and contributors.
+
+...                                                                 3 / 3 (100%)
+
+Time: 173 ms, Memory: 16.00MB
+
+OK (3 tests, 10 assertions)
+```
+
+## **URLバリデーションのテスト**
+
+>We expect only valid URLs to pass validation so that our application doesn’t try to display invalid data.
+
+**hoge**
+
+```php
+/** @test */
+function link_is_not_created_with_an_invalid_url()
+{
+    $this->withoutExceptionHandling();
+
+    $cases = ['//invalid-url.com', '/invalid-url', 'foo.com'];
+
+    foreach ($cases as $case) {
+        try {
+            $response = $this->post('/submit', [
+                'title' => 'Example Title',
+                'url' => $case,
+                'description' => 'Example description',
+            ]);
+        } catch (ValidationException $e) {
+            $this->assertEquals(
+                'The url format is invalid.',
+                $e->validator->errors()->first('url')
+            );
+            continue;
+        }
+
+        $this->fail("The URL $case passed validation when it should have failed.");
+    }
+}
+```
+
+>Laravel 5.5 introduced the withoutExceptionHandling() method which disables Laravel’s route exception handling code used to generate an HTTP response after an exception. We use this to our advantage so we can inspect the validation exception object and assert against the error messages.
+ 
+
+**hoge**
+
+>We loop through various cases (add your own if you’d like to cover more scenarios) and catch instances of ValidationException. If the text makes it past the exception handling, we manually fail the test because we expect the route throws a ValidationExcepiton exception each time.
+
+**hoge**
+
+>The catch block uses the validator object to check the url error and asserts that the actual error message matches the expected validation error message.
+
+**hoge**
+
+>I like using the try/catch technique, followed by a $this->fail() as a safety harness instead of using exception annotations provided by PHPUnit. I feel catching the exception allows the ability to do assertions that wouldn’t otherwise be possible and provides 
+
+**hoge**
+
+## **最大入力値バリデーションのテスト**
+
+
+>We will test a few scenarios with the max:255 validations rules: when the field fails max-length validation with a length of 256 characters, and when the field is long enough to pass validation at 255 characters.
+ 
+
+**hoge**
+
+
+>Although Laravel contains the max validation rule functionality, I like to test it to verify that my application applies the rules. If someone removes the max validation rule, then the tests will catch it.
+
+**hoge**
+
+>I like to test the threshold of min and max validation rules as an extra caution to make sure my application respects the min and max boundaries I set.
+
+**hoge**
+
+>First, let’s test the “max length” scenario:
+
+**hoge**
+
+```php
+/** @test */
+function max_length_fails_when_too_long()
+{
+    $this->withoutExceptionHandling();
+
+    $title = str_repeat('a', 256);
+    $description = str_repeat('a', 256);
+    $url = 'http://';
+    $url .= str_repeat('a', 256 - strlen($url));
+
+    try {
+        $this->post('/submit', compact('title', 'url', 'description'));
+    } catch(ValidationException $e) {
+        $this->assertEquals(
+            'The title may not be greater than 255 characters.',
+            $e->validator->errors()->first('title')
+        );
+
+        $this->assertEquals(
+            'The url may not be greater than 255 characters.',
+            $e->validator->errors()->first('url')
+        );
+
+        $this->assertEquals(
+            'The description may not be greater than 255 characters.',
+            $e->validator->errors()->first('description')
+        );
+
+        return;
+    }
+
+    $this->fail('Max length should trigger a ValidationException');
+}
+```
+
+>Again, we disable exception handling and create data that is one character too long to pass validation.
+
+**hoge**
+
+>We assert each field to make sure they all have a max length validation error message.
+
+**hoge**
+
+>Last, we need to return in the caught exception and use the $this->fail() as a safety harness to fail the test.
+
+**hoge**
+
+>Next, we test the “under the max” scenario:
+
+**hoge**
+
+
+```php
+/** @test */
+function max_length_succeeds_when_under_max()
+{
+    $url = 'http://';
+    $url .= str_repeat('a', 255 - strlen($url));
+
+    $data = [
+        'title' => str_repeat('a', 255),
+        'url' => $url,
+        'description' => str_repeat('a', 255),
+    ];
+
+    $this->post('/submit', $data);
+
+    $this->assertDatabaseHas('links', $data);
+}
+```
+
+>We make the form data long enough to pass max:255 validation and assert that the data is in the database after submitting the data.
+
+**hoge**
+
+>Run the test suite and make sure everything is passing:
+
+```bash
+$ vendor/bin/phpunit
+PHPUnit 6.4.3 by Sebastian Bergmann and contributors.
+
+......                                                              6 / 6 (100%)
+
+Time: 197 ms, Memory: 16.00MB
+
+OK (6 tests, 17 assertions)
+```
+
 
 ## **まとめ**
 
@@ -457,6 +1002,11 @@ _※この絵は[元の絵](https://i2.wp.com/wp.laravel-news.com/wp-content/upl
 
 **私はこのLaravelでのチュートリアル記事が、なぜ多くの人々がLaraveに興奮しているのかを示してくれることを願っています。**
  
+
+
+>Join the weekly newsletter and check out the Laravel tutorials section of the site to go deeper and learn even more about the framework.
+
+**hoge**
 
 
 
