@@ -5,7 +5,7 @@
 ### Update
 
 ```
-UPDATED: AUGUST 29, 2018
+UPDATED: SEPTEMBER 04, 2018
 ```
 
 ### text
@@ -42,7 +42,7 @@ Insert the data into the database.
 Let’s get started!
 
 The First Steps
-With a simple plan of attack outlined, it’s time to get a brand new empty project up and running. I like to put all my projects in a ~/Sites directory, and these instructions will use that location. I’ve already “parked” this directory in Valet, so any folders will automatically be mapped to “foldername.dev” in the browser.
+With a simple plan of attack outlined, it’s time to get a brand new empty project up and running. I like to put all my projects in a ~/Sites directory, and these instructions will use that location. I’ve already “parked” this directory in Valet, so any folders will automatically be mapped to “foldername.test” in the browser.
 
 Open your terminal application and switch into this directory.
 
@@ -60,7 +60,7 @@ source ~/.bash_profile
 Now you can use the Laravel installer to create new projects from the command line:
 
 laravel new links
-This will create a new directory at ~/Sites/links and install an stock Laravel project. Visiting links.dev in the browser now shows the default Laravel welcome page:
+This will create a new directory at ~/Sites/links and install an stock Laravel project. Visiting links.test in the browser now shows the default Laravel welcome page:
 
 
 
@@ -72,7 +72,7 @@ Even though this tutorial will not dive into authentication by running this comm
 With the basics set up and working, it’s time to start doing some coding.
 
 Building a List of Links
-If you start thinking about the whole finished project, it’s easy to get overwhelmed. The best way to fight this is to break everything down into small tasks. So, let’s start with showing a list of links.
+If you start thinking about the whole finished project, it’s easy to get overwhelmed. The best way to fight this is to break everything down into small tasks. So, let’s start by showing a list of links.
 
 Even though showing a list of links sounds like a small task it still requires a database, a database table, data in the table, a database query, and a view file.
 
@@ -334,7 +334,7 @@ $link->save();
 return $link;
 If we want to populate a new model with data, we need to allow the fields to be “fillable” via mass assignment. The fillable property is designed to prevent fields from being mass-assigned except for the items you define in the array.
 
-In our case, we are validating each field so allowing them to be mass-assigned is safe. To allow our model assign values to these fields, open the app/Link.php file and update it to look like the following:
+In our case, we are validating each field so allowing them to be mass-assigned is safe. To allow our model to assign values to these fields, open the app/Link.php file and update it to look like the following:
 
 <?php
 
