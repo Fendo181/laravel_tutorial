@@ -74,7 +74,7 @@ _※フォーチュン500（Fortune 500）は、アメリカ合衆国のフォ�
 
 ## **最初のステップ**
 
->With a simple plan of attack outlined, it’s time to get a brand new empty project up and running. I like to put all my projects in a ~/Sites directory, and these instructions will use that location. I’ve already “parked” this directory in Valet, so any folders will automatically be mapped to “foldername.test" in the browser.
+>With a simple plan of attack outlined, it’s time to get a brand new empty project up and running. I like to put all my projects in a ~/Sites directory, and these instructions will use that location. I’ve already “parked” this directory in Valet, so any folders will automatically be mapped to “foldernam.test" in the browser.
 
 **シンプルな計画をざっくり書くと、空のプロジェクトを使ってそこで始めてみましょう。 私はすべてのプロジェクトを〜/ Sitesディレクトリに入れたいと思っており、チュートリアルでこの場所を使用します。 私は既にこのディレクトリをValetに "展開"しているので、どのフォルダもブラウザの "foldername.test"に自動的にマップされます。**
 
@@ -284,7 +284,7 @@ $this->call(LinksTableSeeder::class);
 >You can now run the migrations and seeds to add data to the table automatically.Using the migrate:fresh command, we can get a clean schema that applies all migrations and then seeds the database:
 
 
-**以下のコマンドでマイグレーションとシードを実行して、テーブルに自動的にテストデータを追加することができます。 `migrate:fresh ` コマンドを使う事でデータベースを全テーブルからドロップしてから、マイグレーションとシードを同時に実行してくれます。**
+**以下のコマンドでマイグレーションとシードを実行して、テーブルに自動的にテストデータを追加することができます。`migrate:fresh`コマンドを使う事でデータベースを全テーブルからドロップしてから、マイグレーションとシードを同時に実行してくれます。**
 
 (seederを追加するには`composer dump-autoload`を実行する必要があります。そうしないと`Class LinksTableSeeder does not exist`でエラーが発生します。)
 ref:https://laravel.com/docs/5.6/seeding#running-seeders
@@ -296,7 +296,7 @@ php artisan migrate:fresh --seed
 
 >Using the [tinker shell](https://laravel-news.com/laravel-tinker) you can start playing around with the model data:
 
-**`tinnker shell`を使う事でさモデルからのデータを取得する事ができます。**
+**`tinnker shell`を使う事でモデルからのデータを取得する事ができます。**
 
 ```php
 >>> \App\Link::first();
@@ -313,17 +313,17 @@ php artisan migrate:fresh --seed
 
 >We have the data place and a model to interact with the database. We are now ready to start building the UI to add new links to the application.
 
-**Laravelにはこのようにデータを用意する場所と、相互的にデータベースと対話できるモデルを持っています。これで、UIを構築してアプリケーションに新しいリンクを追加する準備が整いました。**
+**Laravelにはこのようにデータを用意する場所と、相互的にデータベースと対話できるモデルを持っています。これで、UIを構築してアプリケーションに新しいリンクを追加する準備が整いました。**
 
 ## ルーティングとビュー
 
 >To build out a view showing the list of links, we need to update the main project route and also define a new route that will display our submission form. We can add new routes to our application in the routes/web.php file.
 
-**リンクのリストを表示するビューを構築するには、最初にメインプロジェクトのルーティングを更新して、投稿フォームを表示する新しいルーティングを用意する必要がります。新しいルーティングは`routes/web.php`ファイルを開いて、新しいルートを追加する事ができます。**
+**リンクのリストを表示するビューを構築するには、最初にメインプロジェクトのルーティングを更新して、投稿フォームを表示する新しいルーティングを用意する必要がります。新しいルーティングは`routes/web.php`ファイルを開いて、新しいルートを追加する事ができます。**
 
 >In the web routes file you should see the default route below:
 
-**webのルーティングには以下のデフォルトのルーティングが表示されています。**
+**webのルーティングには以下のデフォルトのルーティングが表示されています。**
 
 
 ```php
@@ -334,11 +334,11 @@ Route::get('/', function () {
 
 >To create a new route we can either use a route closure or a dedicated controller class. In this tutorial, we will use closures for our submission and index routes.
 
-**新しいルートを作成する為には、ルートクロージャまたは専用のコントローラクラスを使用します。 このチュートリアルでは、ルートクロージャを使って投稿フォームと最初のホームページ用のルーティングを定義します。**
+**新しいルートを作成する為に、ルートクロージャまたは専用のコントローラクラスを使用します。 このチュートリアルでは、ルートクロージャを使って投稿フォームと最初のホームページ用のルーティングを定義します。**
 
 >First, let’s update the home route by getting a collection of links from the database and passing them to the view:
 
-**まず、データベースからリンクのコレクションを取得し、ビューに渡す為に、ホームルートを更新しましょう。**
+**まず、データベースからリンクのコレクションを取得し、ビューに渡す為に、ホームルートを更新しましょう。**
 
 ```php
 Route::get('/', function () {
@@ -349,7 +349,7 @@ Route::get('/', function () {
 
 >The second argument can be an associative array of data, and the key ends up being the variable name in the template file.
 
-**`view()`の2番目の引数は連想配列で、指定しているキー名はテンプレートファイルの変数名になります。**
+**`view()`の2番目の引数は連想配列で、指定しているキー名はテンプレートファイルの変数名になります。**
 
 >You can also use a fluent API to define variables if you prefer:
 
@@ -376,7 +376,7 @@ return view('welcome')->withLinks($links);
 
 >Here’s what the welcome.blade.php HTML should look like:
 
-**welcome.blade.phpのHTMLは次のようになります。**
+**welcome.blade.phpのHTMLは次のようになります。**
 
 ```html
 <body>
@@ -418,7 +418,7 @@ return view('welcome')->withLinks($links);
 
 >We are almost done creating our first application in Laravel. We will round out this Laravel tutorial with the ability for others to submit links into the app, which requires three fields: title, URL, and a description.
 
-**Laravelでの最初のアプリケーションの作成は終わりました。次に、ここでのチュートリアルではタイトル、URL、説明という3つのフィールドを必要とするリンクを送信する機能をアプリケーションに追加していきます。**
+**Laravelでの最初のアプリケーションの作成は終わりました。次にここでのチュートリアルではタイトル、URL、説明という3つのフィールドを必要とするリンクを送信する機能をアプリケーションに追加していきます。**
 
 >I am a visual person and before planning out features that will require HTML I like to draw them out so I can get an idea of what I’m building in my head. Here is a simple drawing of this form:
 
@@ -448,7 +448,7 @@ _※この絵は[元の絵](https://i2.wp.com/wp.laravel-news.com/wp-content/upl
 
  >Next, we need to create the submit.blade.php template at resources/views/submit.blade.php with the following boilerplate bootstrap markup:
 
- **次に、ボイラープレートに`bootstrap`を使っている` submit.blade.php`テンプレートファイルを`resources/views/submit.blade.php`に作成します。**
+ **次に、ボイラープレートに`bootstrap`を使っている `submit.blade.php`テンプレートファイルを`resources/views/submit.blade.php`に作成します。**
 
  ```php
 
@@ -499,7 +499,7 @@ _※この絵は[元の絵](https://i2.wp.com/wp.laravel-news.com/wp-content/upl
 @endif
 ```
 
->Each individual form field checks for validation errors and displays an error message and outputs a has-error class:
+>Each individual form field checks for validation errors and displays an error message and outputs a has-error class:
 
 **それぞれのフォームフィールドでは、エラーが発生したかをチェックし、エラーメッセージを表示し`has-error`クラスに出力します。**
 
@@ -516,7 +516,7 @@ _※この絵は[元の絵](https://i2.wp.com/wp.laravel-news.com/wp-content/upl
 
 >If the user submits invalid data, the route will store validation in the session and redirect the user back to the form. The {{ old('title') }} function will populate the originally submitted data. If a user forgot to submit one of the fields, the other fields that have data would be populated after validation fails and errors are shown.
 
-**もしも、ユーザが誤ったデータを投稿する場合には、ルートセッションでバリデーション結果を保存し、投稿フォームにリダイレクトします。 `{{old（ 'title'）}}`は、直前に送信されたデータを表示します。こうする事でもしユーザー直前に送信したデータを忘れた場合でも、データを持っているフィールドにデータが入力された状態にして、バリデーションに失敗したエラー表示します。**
+**もしも、ユーザが誤ったデータを投稿する場合には、ルートセッションでバリデーション結果を保存し、投稿フォームにリダイレクトします。 `{{old（ 'title'）}}`は、直前に送信されたデータを表示します。こうする事でもしユーザー直前に送信したデータを忘れた場合でも、データを持っているフィールドにデータが入力された状態にして、バリデーションに失敗したエラー表示します。**
 
 >If a field has an error, the first() method returns the first error for a given field:
 
@@ -554,7 +554,7 @@ Route::post('/submit', function (Request $request) {
 
  >First, we are injecting the Illuminate\Http\Request which will hold all of the POST data and other data about the request.
 
-**まず、すべてのPOSTデータとリクエストに関する他のデータを保持する`Illuminate \ Http \ Request`を注入します。**
+**まず、すべてのPOSTデータとリクエストに関する他のデータを保持する`Illuminate \ Http \ Request`を注入します。**
 
 >Next, we use the request’s validate() method to validate the form data. The validate method was introduced in Laravel 5.5 and is a nice shortcut over other methods used for validation. As a bonus, the validated fields are returned to the $data variable, and we can use them to populate our model.
 
@@ -563,19 +563,19 @@ Route::post('/submit', function (Request $request) {
 
 >We require all three fields, and using the pipe character; we can define multiple rules. All three rules can have a max of 255 characters, and the url field requires a valid URL.
 
-**ここでは、3つのフィールドをすべて必須項目にして、パイプ文字(`|`)を使って複数のルールを定義することができます。3つのルールはすべて最大255文字を持つことができ、urlフィールドには有効なURLが必要です。**
+**ここでは、3つのフィールドをすべて必須項目にして、パイプ文字(`|`)を使って複数のルールを定義することができます。3つのルールはすべて最大255文字を持つことができ、urlフィールドには有効なURLが必要です。**
 
 >If validation fails, an exception is thrown, and the route returns the user with the original input data and validation errors.
 
 **バリデーションに失敗した場合は例外が投げられて、ルーティングは元の入力データとバリデーションエラーをを返します。**
 
->Next, we use the tap() helper function to create a new Link model instance and then save it. Using tap allows us to call save() and still return the model instance after the save.
+>Next, we use the tap() helper function to create a new Link model instance and then save it. Using tap allows us to call save() and still return the model instance after the save.
 
 **次に、`tap`ヘルパー関数を使用して新しいLinkモデルインスタンスを作成し保存します。 `tap`を使用すると、`save（）`を呼び出しても、保存後にモデルインスタンスを返すことができます。**
 
 >Typically, you would have to do the following without tap, it just adds a little syntactic sugar:
 
-**一般的には`tap`メソッドが使わずに、糖衣構文のように追加しています**
+**一般的には`tap`メソッドが使わずに、糖衣構文のように追加しています**
 
 ```php
 $link = new \App\Link($data);
@@ -590,11 +590,11 @@ return $link;
 
 >If we want to populate a new model with data, we need to allow the fields to be “fillable” via mass assignment. The fillable property is designed to prevent fields from being mass-assigned except for the items you define in the array.
 
-**新しいモデルにデータを設定する場合は、`fillabl`を使用して保存可能なフィールドを定義する必要があります。`fillable`プロパティで配列で定義した項目を除いて、フィールドが`mass-assigned`される事を防ぐように設計されています。**
+**新しいモデルにデータを設定する場合は、`fillabl`を使用して保存可能なフィールドを定義する必要があります。`fillable`プロパティで配列で定義した項目を除いて、フィールドが`mass-assigned`される事を防ぐように設計されています。**
 
 >In our case, we are validating each field so allowing them to be mass-assigned is safe. To allow our model to assign values to these fields, open the app/Link.php file and update it to look like the following:
 
-**今回のケースでは各フィールドをバリデーションして`mass-assigned`されることは安全です。モデルでこれらのフィールドに値を割り当てるには、`app/Link.php`ファイルを開き、次のように更新します。**
+**今回のケースでは各フィールドをバリデーションして`mass-assigned`されることは安全です。モデルでこれらのフィールドに値を割り当てるには、`app/Link.php`ファイルを開き、次のように更新します。**
 
 ```php
 <?php
@@ -615,7 +615,7 @@ class Link extends Model
 
 >If we wanted to prevent mass-assignment, this is how our code would look:
 
-**`mass-assignment`を避けた場合、コードはこのようになります。**
+**`mass-assignment`を避けた場合、コードはこのようになります。**
 
 ```php
 $data = $request->validate([
@@ -636,7 +636,7 @@ $link->save();
 
 >The last thing we do in our POST route redirects the user back to the home page after saving the link successfully.
 
-**POSTルートで最後に行っている事は、リンクを正常に保存した後、ユーザーをホームページにリダイレクトさせています。**
+**POSTルートで最後に行っている事は、リンクを正常に保存した後、ユーザーをホームページにリダイレクトさせています。**
 
 ## **まとめ**
 
