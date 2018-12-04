@@ -1,4 +1,5 @@
-## laravel_tutorial
+## laravel_tutorial v0.1
+
 
 ### Origin
 
@@ -19,7 +20,9 @@
 ## Update
 
 - 2017/07/01
-  - InitialCommmit
+  - InitialCommit
+  - 5.4系
+  - [old_laravel_tutorilal_linklist](https://github.com/Fendo181?tab=repositories)
 - 2018/05/01
   - Update
   - 5.6に対応した書き方を慣れる為に再度修正する。
