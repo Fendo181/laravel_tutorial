@@ -647,8 +647,3 @@ $link->save();
 >I hope this introduction to Laravel shows you why so many people are excited about the framework.
 
 **私はこのLaravelでのチュートリアル記事が、なぜ多くの人々がLaraveに興奮しているのかを示してくれることを願っています。**
-
-
-
-
-
