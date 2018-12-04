@@ -315,7 +315,7 @@ php artisan migrate:fresh --seed
 
 **Laravelにはこのようにデータを用意する場所と、相互的にデータベースと対話できるモデルを持っています。これで、UIを構築してアプリケーションに新しいリンクを追加する準備が整いました。**
 
-## ルーティングとビュー
+## **ルーティングとビュー**
 
 >To build out a view showing the list of links, we need to update the main project route and also define a new route that will display our submission form. We can add new routes to our application in the routes/web.php file.
 
@@ -414,7 +414,7 @@ return view('welcome')->withLinks($links);
 ![リンク.png](https://qiita-image-store.s3.amazonaws.com/0/64829/4991290d-e644-cd66-7fe4-fb2d552990d1.png)
 
 
-## リンクの投稿フォームの表示
+## **リンクの投稿フォームの表示**
 
 >We are almost done creating our first application in Laravel. We will round out this Laravel tutorial with the ability for others to submit links into the app, which requires three fields: title, URL, and a description.
 
@@ -526,7 +526,7 @@ _※この絵は[元の絵](https://i2.wp.com/wp.laravel-news.com/wp-content/upl
 {{ $errors->first('title') }}
 ```
 
-### 投稿フォーム
+## **投稿フォーム**
 
 >With the form in place, we are ready to handle the POST data and validate data. Back in the routes/web.php file, create another route for the POST request:
 
@@ -637,6 +637,8 @@ $link->save();
 >The last thing we do in our POST route redirects the user back to the home page after saving the link successfully.
 
 **POSTルートで最後に行っている事は、リンクを正常に保存した後、ユーザーをホームページにリダイレクトさせています。**
+
+
 
 ## **まとめ**
 
