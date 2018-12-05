@@ -131,7 +131,7 @@ MVCパターンとModel・View・Controllerの略でそれぞれに役割を分�
 
 Laravelでは新しく作成するControllerは`app/controller`ディレクトリ直下に生成されます。Viewファイルは`resources/views`直下に配置します。
 
-ではModelはと言うと?ここがLaravelの特徴でもあるのですが、Laravelは`models`に相当するディレクトリがないです。理由は[ここ](https://readouble.com/laravel/5.6/ja/structure.html)に詳細に記載されているのですが、これは意図的に設計されています。なので、最初は戸惑うと思いますが、新しく`Model`を作成した場合は`app`直下に作られる事を覚えておいて下さい。
+では「Modelは?」と言うと、ここがLaravelの特徴でもあるのですが、Laravelは`models`に相当するディレクトリがないです。理由は[ここ](https://readouble.com/laravel/5.6/ja/structure.html)に詳細に記載されているのですが、これは意図的に設計されています。なので、最初は戸惑うと思いますが、新しく`Model`を作成した場合は`app`直下に作られる事を覚えておいて下さい。
 
 
 ## Linkモデルを作成する。
@@ -185,20 +185,19 @@ php artisan migrate
 
 と言っても、まだ入力のフォーム画面も用意されてないのにどうするのか?というと、Laravelはこれを助ける2つの機能を提供します。 Seeder(初期値)とModelFactoryです。
 
->- [モデルファクトリー](https://readouble.com/laravel/5.6/ja/testing.html#model-factories)
+>- [ModelFactory](https://readouble.com/laravel/5.6/ja/testing.html#model-factories)
 >- [Seeder](https://readouble.com/laravel/5.6/ja/seeding.html)
 
 ここでは2つの機能を使う事でテストデータを作成するModelFactoryを定義し、SeederからModelFactoryを利用することでテストデータを作成する方法を紹介します。
 
 以下のコマンドを実行して`Linkモデル`を作ると同時に、`LinkFactory`も一緒に生成しましょう。
+`Factory`でテストデータを生成する際には関連するモデルが必要な為です。
 
 ```sh
 php artisan make:model --factory Link
 ```
 
-なぜ、モデルも一緒に作るのかと言うと、`Factory`でテストデータを生成する際には、関連するモデルが必要な為です。
-
-LinkFactory.phpを開き、リンクテーブルにファイルを追加しましょう。
+LinkFactory.phpを開き、カスタマイズしていきます。
 LinkFactory.phpは`database/factories/`にあります。
 
 
@@ -219,18 +218,15 @@ $factory->define(App\Link::class, function (Faker $faker) {
 ```
 
 `title`部分でテストデータを生成する際に、`substr`メソッドを使っているのは、テストデータで生成される文字列の文末のピリオドを削除する為です。
-
 次に、テストデータをテーブルに簡単に追加できるように `LinksTableSeeder`を作成します。
 
 
-```
+```sh
 php artisan make:seeder LinksTableSeeder
 ```
 
-
 新しく生成したseederファイルは`/database/seeds/`に生成されます。
 作成したばかりのLinksTableSeeder.phpファイルを開き、`run`メソッドに上記で作成したリンクモデルファクトリを使用して、10人分のデータを用意するように記述します。
-
 
 ```php
 public function run()
@@ -239,9 +235,7 @@ public function run()
 }
 ```
 
-
 `DatabaseSeeder.php`を開き、runメソッドに追加します。
-
 
 ```php
 public function run()
@@ -251,7 +245,6 @@ public function run()
 ```
 
 これでテストデータを10人分用意する事ができました。
-
 以下のコマンドでマイグレーションとシードを実行して、テーブルにテストデータを追加します。
 
 
@@ -748,11 +741,12 @@ class SubmitLinkTest extends TestCase
 - 3.有効でないリンクはバリデーションで失敗する
 - 4.フィールドに入力された文字がmax:255よりも長い場合は失敗する
 - 5.フィールドに入力された文字がmax:255より少ない場合は成功する
--
+
+
 では1つ1つのテストケースを通していきましょう。
 
 
-### 有効なリンクは保存できる
+### 有効なリンクは保存できる場合のテスト
 
 最初に行うテストでは有効なリンクがデータベースに保存されることを確認するテストを実行します
 
