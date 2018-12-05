@@ -185,27 +185,42 @@ php artisan migrate
 
 と言っても、まだ入力のフォーム画面も用意されてないのにどうするのか?というと、Laravelはこれを助ける2つの機能を提供します。 Seeder(初期値)とModelFactoryです。
 
->- [モデルファクトリー](https://readouble.com/laravel/5.1/ja/testing.html#model-factories)
->- [Seeder](https://readouble.com/laravel/5.1/ja/seeding.html)
+>- [モデルファクトリー](https://readouble.com/laravel/5.6/ja/testing.html#model-factories)
+>- [Seeder](https://readouble.com/laravel/5.6/ja/seeding.html)
 
 ここでは2つの機能を使う事でテストデータを作成するModelFactoryを定義し、SeederからModelFactoryを利用することでテストデータを作成する方法を紹介します。
 
-ModelFactory.phpを開き、リンクテーブルにファイルを追加しましょう。
-ModelFactory.phpは`database/factories/`にあります。
+以下のコマンドを実行して`Linkモデル`を作ると同時に、`LinkFactory`も一緒に生成しましょう。
+
+```sh
+php artisan make:model --factory Link
+```
+
+なぜ、モデルも一緒に作るのかと言うと、`Factory`でテストデータを生成する際には、関連するモデルが必要な為です。
+
+LinkFactory.phpを開き、リンクテーブルにファイルを追加しましょう。
+LinkFactory.phpは`database/factories/`にあります。
 
 
 ```php
-$factory->define(App\Link::class, function (Faker\Generator $faker) {
+<?php
+
+use Faker\Generator as Faker;
+
+/* @var Illuminate\Database\Eloquent\Factory $factory */
+
+$factory->define(App\Link::class, function (Faker $faker) {
     return [
-        'title' => $faker->name,
+        'title' => substr($faker->sentence(2), 0, -1),
         'url' => $faker->url,
         'description' => $faker->paragraph,
     ];
 });
 ```
 
+`title`部分でテストデータを生成する際に、`substr`メソッドを使っているのは、テストデータで生成される文字列の文末のピリオドを削除する為です。
 
-次に、テストデータをテーブルに簡単に追加できるようにLinksTableSeederを作成します。
+次に、テストデータをテーブルに簡単に追加できるように `LinksTableSeeder`を作成します。
 
 
 ```
@@ -213,9 +228,7 @@ php artisan make:seeder LinksTableSeeder
 ```
 
 
-
 新しく生成したseederファイルは`/database/seeds/`に生成されます。
-
 作成したばかりのLinksTableSeeder.phpファイルを開き、`run`メソッドに上記で作成したリンクモデルファクトリを使用して、10人分のデータを用意するように記述します。
 
 
@@ -227,7 +240,7 @@ public function run()
 ```
 
 
-DatabaseSeeder.phpを開き、runメソッドに追加します。
+`DatabaseSeeder.php`を開き、runメソッドに追加します。
 
 
 ```php
@@ -246,6 +259,9 @@ public function run()
 php artisan migrate --seed
 ```
 
+また`migrate:fresh`を使う事で、一旦tableにあるデータをリセットして、`seeder`で初期値データが入っている状態にする事もできます。
+
+[データベース：マイグレーション 5.6 Laravel 全テーブル削除後のマイグレーション](https://readouble.com/laravel/5.6/ja/migrations.html#rolling-back-migrations)
 
 ### ルーティングとビュー
 
@@ -263,11 +279,11 @@ Route::get('/', function () {
 ここでの処理は
 
 ```
-①GETで`/`(root)にアクセスした際に
-②viewヘルパ関数を使って`resources/views/`にある`welcome.blade.php`を呼び出しています。
+①GETで/(root)にアクセスした際に
+②viewヘルパ関数を使って resources/views/ にある welcome.blade.php を呼び出しています。
 ```
 
-従って最初のwelcomeページの正体はwelcome.blade.htmlだとここで気付きます。
+従って最初のwelcomeページの正体は`welcome.blade.html`だとここで気付きます。
 
 ここにリンクリストを取得するためのコードを追加してみましょう。
 
@@ -283,46 +299,72 @@ Route::get('/', function () {
 ```
 ①GETで/にアクセスした時に　
 ②Linksモデル(Eloquent)のallメソッドを使って、取得した全てのデータを$linksに代入する。
-③welcome.balede.htmlに$linksのデータをlinksとして渡す。
+③view()を使って第一引数にテンプレートのキー名(welcome.balede.html)を指定して、第二引数で$linksのデータをlinksとして渡す。
 ```
 
 と処理をしています。
-次に、welcome.blade.phpファイルを編集し、単純な`foreach`を追加してすべてのリンクを表示します。
+次に、`welcome.blade.php` ファイルを編集し、単純な`foreach`を追加してすべてのリンクを表示します。
 
 ```php
-<div class="content">
-  <div class="title m-b-md">
-    Laravel
-  <div class="title m-b-md">
 @foreach ($links as $link)
   <li>{{ $link->title }}</li>
 @endforeach
+```
+
+最終的に`welcome.blade.php`は以下のようになります。
+
+```welcome.blade.php
+<body>
+    <div class="flex-center position-ref full-height">
+        @if (Route::has('login'))
+            <div class="top-right links">
+                @auth
+                    <a href="{{ url('/home') }}">Home</a>
+                @else
+                    <a href="{{ route('login') }}">Login</a>
+                    <a href="{{ route('register') }}">Register</a>
+                @endauth
+            </div>
+        @endif
+
+        <div class="content">
+            <div class="title m-b-md">
+                Laravel
+            </div>
+
+            <div class="links">
+                @foreach ($links as $link)
+                    <a href="{{ $link->url }}">{{ $link->title }}</a>
+                @endforeach
+            </div>
+        </div>
+    </div>
+</body>
 ```
 
 ブラウザを更新すると、追加されたすべてのリンクのリストが表示され、先程ModelFactoryとSeedsで生成したテストデータが表示されるのが確認できます。
 
 ![リンク.png](https://qiita-image-store.s3.amazonaws.com/0/64829/4991290d-e644-cd66-7fe4-fb2d552990d1.png)
 
-
+これでLaravelを使った最初のアプリケーションの作成は終わりました。
 
 ## 投稿フォーム
 
-次の実装する大きな機能は、フォームからリンクを追加できるようにする事です。 これには、タイトル、URL、説明の3つのフィールドが必要です。
+次の実装する大きな機能は、フォームからリンクを追加できるようにする事です。
+これには、タイトル、URL、説明の3つのフィールドが必要です。
 
 リンクリストに必要な要件を洗い出します。
 
-- URLのタイトル
+- タイトル
 - URL
 - 説明
 
-
-
-フォームの簡単な図です。
+次に今回作成するフォームの簡単な図です。
 
 ![laravel_mock.png](https://qiita-image-store.s3.amazonaws.com/0/64829/936e0d41-4504-85ab-caec-8d7952045123.png)
 
 
-まず、`routes / web.php`ファイルに新しいルーティングを作成します。**
+まず、`routes/web.php`に新しい投稿フォーム用のルーティングを作成します。**
 
 ```php
 Route::get('/submit', function () {
@@ -333,19 +375,21 @@ Route::get('/submit', function () {
 ここでの処理も先程同様に
 
 ```
-①GETで`/submit`にアクセスした時に　
-②viewヘルパ関数を使って`resources/views/`にある`submit.blade.php`を呼び出しています。
+①GETで /submit にアクセスした時に　
+②viewヘルパ関数を使って resources/views/ にある submit.blade.php を呼び出しています。
 ```
 
 ここからは実際にテンプレート元になる`default.blade.php`と、投稿フォーム用の`submit.blade.php`を作ります。
 
-なぜ2つのファイルを用意するのか?というと、LaravelのViewで使われる[Bladeテンプレート](https://readouble.com/laravel/5.6/ja/blade.html)は共通部分をテンプレート化して、そのテンプレートを利用して継承する事ができます。詳しくは次の章で説明します。
+なぜ2つのファイルを用意するのか?というと、LaravelのViewで使われる[Bladeテンプレート](https://readouble.com/laravel/5.6/ja/blade.html)は共通部分をテンプレート化して、そのテンプレートを利用して継承する事ができます。
+詳しくは次の章で説明します。
 
 ### Bladeテンプレートの概要説明
 
 `submit.blade.php`を作成する前にここで、簡単な`Bladeテンプレート`の利点である継承とセクションについて紹介します。実際に例をみてみましょう。
 
-```default.blade.php
+
+```app.blade.php
 <!-- resources/views/layouts/app.blade.phpとして保存 -->
 
 <!DOCTYPE html>
@@ -354,6 +398,7 @@ Route::get('/submit', function () {
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+     <!-- Bootstrap4 CDN -->
     <title>@yield('title')</title>
 </head>
 <body>
@@ -364,14 +409,14 @@ Route::get('/submit', function () {
 </body>
 ```
 
-`default.blade.php`は親テンプレートになります。
+`app.blade.php`は親テンプレートになります。
 ここで大事なので`@yield('title')`と`@yield('content')`です。これはセクション機能と呼ばれます。この親テンプレート(`default.blade.php`)を継承する事で、継承先の子テンプレートで`@sectionディレクティブ`を定義する事により、指定した内容を表示する事ができます。
 
-例えばこんな感じに`default.blade.php`を継承した子テンプレート(`app.blade.php`)を用意するとします。
+例えばこんな感じに`app.blade.php`を継承した子テンプレート(`default.blade.php`)を用意するとします。
 
-```app.blade.php
+```default.blade.php
 # 親元のテンプレートを継承する。
-@extends('layouts.default')
+@extends('layouts.app')
 
 
 @section('title', 'Laravelチュートリアル')
@@ -383,7 +428,8 @@ Route::get('/submit', function () {
 
 この用に定義する事で、子テンプレートは親テンプレートを継承しているので、読み込まれる際は以下のようにコードが置き換えられて、表示されるようになります。
 
-```app.php
+
+```html
 <html>
     <head>
         <title>Laravelチュートリアル</title>
@@ -398,7 +444,7 @@ Route::get('/submit', function () {
 
 上記のように、子テンプレートは、親テンプレートを継承する事で少ない記述で済み、変更箇所のみテンプレートに書けばいいので、シンプルで分かりやすく、保守しやすいViewファイルが作られるようになっています。
 
-では次の投稿フォーム同じ要領で`default.blade.php`を継承して作成してみまましょう。
+では次の投稿フォームでは`app.blade.php`を継承した、`default.blade.php`を使って作成してみまましょう。
 
 ### 投稿フォームを作成する
 
@@ -407,47 +453,42 @@ Route::get('/submit', function () {
 
 
 ```php
-#<!-- resources/views/submit.blade.php.blade.phpとして保存 -->
-@extends('layouts.default')
+@extends('default')
 
 @section('content')
-<div class="row">
-    <h1>Submit</h1>
-    <form action="/submit" method="post">
-        {!! csrf_field() !!}
-        <div class="form-groupe">
-            <label for="title">Title</label>
-            <input type="text" class="form-control" id="title" name="title" placeholder="Title" value="{{ old('title') }}">
-            @if ($errors->has('title'))
-                <div class="alert alert-danger">{{ $errors->first('title') }}</div>
-            @endif
+    <div class="container">
+        <div class="row">
+            <h1>Submit a link</h1>
+            <form action="/submit" method="post">
+                {!! csrf_field() !!}
+
+                <div class="form-group">
+                    <label for="title">Title</label>
+                    <input type="text" class="form-control" id="title" name="title" placeholder="Title">
+                </div>
+
+                <div class="form-group">
+                <label for="url">Url</label>
+                    <input type="text" class="form-control" id="url" name="url" placeholder="URL">
+                </div>
+
+                <div class="form-group">
+                    <label for="description">Description</label>
+                    <textarea class="form-control" id="description" name="description" placeholder="description"></textarea>
+                </div>
+
+                <button type="submit" class="btn btn-default">Submit</button>
+            </form>
         </div>
-        <div class="form-group">
-           <label for="url">Url</label>
-           <input type="text" class="form-control" id="url" name="url" placeholder="URL" value="{{ old('url') }}">
-           @if ($errors->has('url'))
-               <div class="alert alert-danger">{{ $errors->first('url') }}</div>
-           @endif
-       </div>
-       <div class="form-group">
-           <label for="description">Description</label>
-           <textarea class="form-control" id="description" name="description" placeholder="description">{{ old('description') }}</textarea>
-           @if ($errors->has('description'))
-               <div class="alert alert-danger">{{ $errors->first('description') }}</div>
-           @endif
-       </div>
-       <button type="submit" class="btn btn-success">Submit</button>
-       <a href="{{ url('/') }}" class="btn btn-default" role="button">Back</a>
-    </form>
+    </div>
 @endsection
 ```
 
+
+
 `localhost:8000/submit`にアクセスして以下のフォーム画面が表示される事を確認して下さい。
 
-![form.png](https://qiita-image-store.s3.amazonaws.com/0/64829/46dba030-3aac-0056-e07d-4a26a019bcb6.png)
-
-
-
+![リンク.png](https://qiita-image-store.s3.amazonaws.com/0/64829/4991290d-e644-cd66-7fe4-fb2d552990d1.png)
 
 ## 投稿フォームのバリデーションとルーティング
 
@@ -458,23 +499,16 @@ Route::get('/submit', function () {
 ```php
 use Illuminate\Http\Request;
 
- Route::post('/submit', function(Request $request) {
-
-    $validator = Validator::make($request->all(), [
-        'title' => 'required|max:255',
-        'url' => 'required|max:255|url',
-        'description' => 'required|max:255',
+Route::post('/submit', function (Request $request) {
+    $data = $request->validate([
+        'title' => 'required | max:255',
+        'url'  => 'required | url | max:255',
+        'description' => 'required | max:255',
     ]);
-    if ($validator->fails()) {
-        return back()
-            ->withInput()
-            ->withErrors($validator);
-    }
-    $link = new \App\Link;
-    $link->title = $request->title;
-    $link->url = $request->url;
-    $link->description = $request->description;
+
+    $link = new App\Link($data);
     $link->save();
+
     return redirect('/');
 });
 ```
@@ -483,11 +517,17 @@ use Illuminate\Http\Request;
 
 ```
 ①POSTで/submitにアクセスする。
-②バリデーション
-③バリデーションでエラーが発生した場合、、セッションにエラーメッセージをフラッシュデータとして保存して元のページへリダイレクトさせます。
-④バリデーションの検証が通ったらLinkモデルを操作してフォームに投稿されたデータをDBに保存する。
-⑤その後に/(root)にリダイレクトさせる。
+②validateメソッドを使ってバリデーションを行う
+エラーが発生した場合、、セッションにエラーメッセージをフラッシュデータとして保存します。
+③バリデーションの検証が通ったらLinkモデルを生成してフォームに投稿されたデータをDBに保存する。
+④その後に/(root)にリダイレクトさせる。
 ```
+
+②の`validate`メソッドはLaravel 5.5で追加されたメソッドです。
+バリデーションルールに成功すると、コードは通常通り続けて実行されます。
+逆にバリデーションに失敗すると、例外が投げられ、ユーザーに対し自動的に適切なエラーレスポンスが返されようになっています。
+
+>[バリデーション 5.6 Laravel](https://readouble.com/laravel/5.6/ja/validation.html#quick-writing-the-validation-logic)
 
 上の処理を意識してもう一度コードを見てみましょう。
 
@@ -495,28 +535,20 @@ use Illuminate\Http\Request;
 ```php
 use Illuminate\Http\Request;
 
- // ①POSTで/submitにアクセスする。
- Route::post('/submit', function(Request $request) {
-
-    // ②バリデーション
-    $validator = Validator::make($request->all(), [
-        'title' => 'required|max:255',
-        'url' => 'required|max:255|url',
-        'description' => 'required|max:255',
+// ①POSTで/submitにアクセスする。
+Route::post('/submit', function (Request $request) {
+    // ②validateメソッドを使ってバリデーションを行う
+    $data = $request->validate([
+        'title' => 'required | max:255',
+        'url'  => 'required | url | max:255',
+        'description' => 'required | max:255',
     ]);
-    // ③バリデーションでエラーが発生した場合、、セッションにエラーメッセージをフラッシュデータとして保存して元のページへリダイレクトさせます。
-    if ($validator->fails()) {
-        return back()
-            ->withInput()
-            ->withErrors($validator);
-    }
-    // ④バリデーションの検証が通ったらLinkモデルを操作してフォームに投稿されたデータをDBに保存する。
-    $link = new \App\Link;
-    $link->title = $request->title;
-    $link->url = $request->url;
-    $link->description = $request->description;
+
+    // ③ Linkモデルを生成
+    $link = new App\Link($data);
     $link->save();
-    // ⑤その後に/(root)にリダイレクトさせる。
+
+    // リダイレクトする
     return redirect('/');
 });
 ```
