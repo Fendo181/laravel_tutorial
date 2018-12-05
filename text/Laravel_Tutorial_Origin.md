@@ -115,7 +115,7 @@ source ~/.bash_profile
 
 >Now you can use the Laravel installer to create new projects from the command line:
 
-**これで、Laravelインストーラを使ってコマンドライン上から新しいプロジェクトを作成することができます。**
+**これで、Laravelインストーラを使ってコマンドライン上から新しいプロジェクトを作成できます。**
 
 ```bash
 laravel new links
@@ -284,7 +284,7 @@ $this->call(LinksTableSeeder::class);
 >You can now run the migrations and seeds to add data to the table automatically.Using the migrate:fresh command, we can get a clean schema that applies all migrations and then seeds the database:
 
 
-**以下のコマンドでマイグレーションとシードを実行して、テーブルに自動的にテストデータを追加することができます。`migrate:fresh`コマンドを使う事でデータベースを全テーブルからドロップしてから、マイグレーションとシードを同時に実行してくれます。**
+**以下のコマンドでマイグレーションとシードを実行して、テーブルに自動的にテストデータを追加できます。`migrate:fresh`コマンドを使う事でデータベースを全テーブルからドロップしてから、マイグレーションとシードを同時に実行してくれます。**
 
 (seederを追加するには`composer dump-autoload`を実行する必要があります。そうしないと`Class LinksTableSeeder does not exist`でエラーが発生します。)
 ref:https://laravel.com/docs/5.6/seeding#running-seeders
@@ -558,12 +558,12 @@ Route::post('/submit', function (Request $request) {
 
 >Next, we use the request’s validate() method to validate the form data. The validate method was introduced in Laravel 5.5 and is a nice shortcut over other methods used for validation. As a bonus, the validated fields are returned to the $data variable, and we can use them to populate our model.
 
-**次に、リクエストの`validate（）`メソッドを使用してフォームデータをバリデーションします。 `validate`メソッドは[Laravel 5.5](https://laravel-news.com/laravel-5-5)で導入されました。これは、バリデーションに使用される他のメソッドより優れたショートカットです。 ボーナスとして、バリデーションされたフィールドは`$data`変数に返され、モデルを作成するために使用することができます。**
+**次に、リクエストの`validate（）`メソッドを使用してフォームデータをバリデーションします。 `validate`メソッドは[Laravel 5.5](https://laravel-news.com/laravel-5-5)で導入されました。これは、バリデーションに使用される他のメソッドより優れたショートカットです。 ボーナスとして、バリデーションされたフィールドは`$data`変数に返され、モデルを作成するために使用できます。**
 
 
 >We require all three fields, and using the pipe character; we can define multiple rules. All three rules can have a max of 255 characters, and the url field requires a valid URL.
 
-**ここでは、3つのフィールドをすべて必須項目にして、パイプ文字(`|`)を使って複数のルールを定義することができます。3つのルールはすべて最大255文字を持つことができ、urlフィールドには有効なURLが必要です。**
+**ここでは、3つのフィールドをすべて必須項目にして、パイプ文字(`|`)を使って複数のルールを定義できます。3つのルールはすべて最大255文字を持つことができ、urlフィールドには有効なURLが必要です。**
 
 >If validation fails, an exception is thrown, and the route returns the user with the original input data and validation errors.
 
