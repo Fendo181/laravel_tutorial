@@ -2,23 +2,12 @@
 
 namespace Tests\Feature;
 
-use Dotenv\Exception\ValidationException;
+use Illuminate\Validation\ValidationException;
 use Tests\TestCase;
-use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class SubmitLinkTest extends TestCase
 {
-    /**
-     * A basic test example.
-     *
-     * @return void
-     */
-//    public function testExample()
-//    {
-//        $this->assertTrue(true);
-//    }
-
    use RefreshDatabase;
 
     /** @test */
@@ -53,37 +42,25 @@ class SubmitLinkTest extends TestCase
     /** @test */
     function link_is_not_created_with_an_invalid_url()
     {
-//        $this->withExceptionHandling();
-//
-//        $cases = ['//invalid-url.com', '/invalid-url', 'foo.com'];
-//
-//        foreach ($cases as $case){
-//            try {
-//                $response = $this->post('/submit', [
-//                    'title' => 'Example Title',
-//                    'url' => $case,
-//                    'description' => 'Example description',
-//                ]);
-//           }catch(ValidationException $e){
-//                $this->assertEquals(
-//                    'The url format is invalid.',
-//                    $e->validator->errors()->first('url')
-//                );
-//             continue;
-//            }
-//
-//            $this->fail("The URL $case passed validation when it should have failed.");
-//        }
-    }
+        $this->withoutExceptionHandling();
 
-    /** @test */
-    function  max_length_fails_when_too_long()
-    {
+        $cases = ['//invalid-url.com', '/invalid-url', 'foo.com'];
 
-    }
-
-    /** @test */
-    function max_length_succeeds_when_under_max()
-    {
+        foreach ($cases as $case) {
+            try {
+                $response = $this->post('/submit', [
+                    'title' => 'Example Title',
+                    'url' => $case,
+                    'description' => 'Example description',
+                ]);
+            } catch (ValidationException $e) {
+                $this->assertEquals(
+                    'The url format is invalid.',
+                    $e->validator->errors()->first('url')
+                );
+                continue;
+            }
+            $this->fail("The URL $case passed validation when it should have failed.");
+        }
     }
 }
