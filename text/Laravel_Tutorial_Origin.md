@@ -638,7 +638,7 @@ $link->save();
 
 **POSTルートで最後に行っている事は、リンクを正常に保存した後、ユーザーをホームページにリダイレクトさせています。**
 
-## 投稿フォームのテスト
+## 投稿フォームのテスト
 
 >Laravel makes HTTP testing a breeze for performing integration tests against routes and middleware, so let’s write a few feature tests to verify our code works as expected.
 
@@ -646,7 +646,7 @@ $link->save();
 
 >Before we get started, we need to adjust a few things in our phpunit.xml file so that we can use an in-memory SQLite database. You will need to make sure that you have the proper PHP modules installed.
 
-**開始する前に、phpunit.xmlファイルでいくつか設定を調整して、SQLiteデータベースを使用するようにします。PHPモジュールがインストールされていることを確認しましょう。**
+**開始する前に、phpunit.xmlファイルでいくつか設定を調整して、SQLiteデータベースを使用するようにします。PHPモジュールがインストールされていることを確認しましょう。**
 
 ```php
 <php>
