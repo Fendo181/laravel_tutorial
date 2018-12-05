@@ -10,7 +10,7 @@
 
 上記の記事を改変して初心者向けに改良した記事
 
-- [はじめてのLaravelアプリケーションガイド](https://qiita.com/Fendo181/items/dece727ea402552fee19) 
+- [はじめてのLaravelアプリケーションガイド](https://qiita.com/Fendo181/items/dece727ea402552fee19)
 
 ## Version
 
@@ -27,3 +27,6 @@
   - Update
   - 5.6に対応した書き方を慣れる為に再度修正する。
   - テストを追加
+- 2018/12/05
+  -Laravel5.6に対応したチュートリアルの翻訳が終わった。
+  
