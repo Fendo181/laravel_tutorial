@@ -638,13 +638,353 @@ $link->save();
 
 **POSTルートで最後に行っている事は、リンクを正常に保存した後、ユーザーをホームページにリダイレクトさせています。**
 
+## 投稿フォームのテスト
+
+>Laravel makes HTTP testing a breeze for performing integration tests against routes and middleware, so let’s write a few feature tests to verify our code works as expected.
+
+**Laravelはルートと[ミドルウェア](https://laravel-news.com/testing-laravel-middleware)に対する統合テストを実行するためのHTTPテストを簡単に行えるので、コードが期待どおりに機能することを検証するためにいくつかの機能テストを作成しましょう。**
+
+>Before we get started, we need to adjust a few things in our phpunit.xml file so that we can use an in-memory SQLite database. You will need to make sure that you have the proper PHP modules installed.
+
+**開始する前に、phpunit.xmlファイルでいくつか設定を調整して、SQLiteデータベースを使用するようにします。PHPモジュールがインストールされていることを確認しましょう。**
+
+```php
+<php>
+        <!-- ... -->
+    <env name="DB_CONNECTION" value="sqlite"/>
+    <env name="DB_DATABASE" value=":memory:"/>
+        <!-- ... -->
+</php>
+```
+
+>Next, remove the placeholder test that ships with Laravel:
+
+**次に、デフォルトで存在しているテストファイルを削除します。**
+
+```sh
+rm tests/Feature/ExampleTest.php
+```
+
+>We are ready to start testing the /submit form through HTTP requests to make sure that the route validation, saving, and redirecting are working as expected.
+
+**これでルーティングでのバリデーション、保存、およびリダイレクトが期待どおりに機能していることを確認するために、`HTTPリクエスト`を使って`submit`フォームをテストする準備が整いました。**
+
+>First, let’s create a new feature test to test against our route:
+
+**まず、ルーティングに対してテストするための新しいフィーチャーテストを作成します。**
+
+```sh
+php artisan make:test SubmitLinksTest
+```
+
+>The command creates a new testing file with the proper dependencies, including a RefreshDatabase trait that we are going to use to verify that our links are being saved to the database when valid.
+
+**このコマンドを打つことで、有効なリンクデータがデータベースに保存されていることを確認するために使用する`RefreshDatabase`を含んだ、適切な依存関係を持つテストファイルを作成します。**
+
+>Open the new tests/Feature/SubmitLinksTest.php file and let’s define a few skeleton tests in the body of the class that we are going to flesh out:
+
+**新しい`tests/Feature/SubmitLinksTest.php`ファイルを開き、次のようにいくつかのテストケースを定義しましょう：**
+
+```php
+/** @test */
+function guest_can_submit_a_new_link() {}
+
+/** @test */
+function link_is_not_created_if_validation_fails() {}
+
+/** @test */
+function link_is_not_created_with_an_invalid_url() {}
+
+/** @test */
+function max_length_fails_when_too_long() {}
+
+/** @test */
+function max_length_succeeds_when_under_max() {}
+```
+
+>These tests should give you a high-level overview of what we are going to test:
+
+**これらのテストは、これから記述していくテストコードの概要を示してます。**
+
+>- 1.Verify that valid links get saved in the database
+>- 2.When validation fails, links are not in the database
+>- 3.Invalid URLs are not allowed
+>- 4.Validation should fail when the fields are longer than the max:255 validation rule
+>- 5.Validation should succeed when the fields are long enough according to max:255.
+
+- **1.有効なリンクがデータベースに保存されることを確認する**
+- **2.バリデーションに失敗すると、リンクはデータベースに保存されない**
+- **3.有効でないリンクは、許可されない**
+- **4.フィールドに入力された文字が`max:255`よりも長い場合は失敗する。**
+- **5.フィールドに入力された文字が`max:255`に従って十分に長い場合は成功する。**
+
+>We might be missing some things, but for your first Laravel application, this is a decent list that should illustrate some basic HTTP testing techniques in Laravel.
+
+**いくつか不足しているかもしれませんが最初のLaravelアプリケーションではこれらが基本的なHTTPテスト手法を説明するのに適切な一覧になります。**
+
+
+## **有効なリンクを保存する**
+
+>The first test we’ll write is the test that verifies that valid data gets stored in the database:
+
+**最初に行うテストでは、有効なデータがデータベースに格納されることを確認するテストを実行します**
+
+```php
+<?php
+
+namespace Tests\Feature;
+
+use Illuminate\Validation\ValidationException;
+use Tests\TestCase;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+
+class SubmitLinksTest extends TestCase
+{
+    use RefreshDatabase;
+
+    /** @test */
+    function guest_can_submit_a_new_link()
+    {
+        $response = $this->post('/submit', [
+            'title' => 'Example Title',
+            'url' => 'http://example.com',
+            'description' => 'Example description.',
+        ]);
+
+        $this->assertDatabaseHas('links', [
+            'title' => 'Example Title'
+        ]);
+
+        $response
+            ->assertStatus(302)
+            ->assertHeader('Location', url('/'));
+
+        $this
+            ->get('/')
+            ->assertSee('Example Title');
+    }
+}
+```
+
+>Take note of the RefreshDatabase trait which makes sure that each test has a new database to give each test a pristine database environment with all the migrations.
+
+`RefreshDatabase`トレイトによって、テストが実行される際にすべてのマイグレーション環境に応じた新しいデータベースが提供されることに注意してください。
+
+>Our first test submits valid post data, which returns a response object that we can use to assert that our route responded as expected. We verify that the database contains a record with the title we just created.
+
+**最初のテストは有効なデータを送信した際に、レスポンスで帰ってくるオブジェクトが、ルーティングが期待どおりに応答したことを示すために使用できます。ここではデータベースに、作成したばかりのタイトルのレコードが含まれていることを確認しています。**
+
+>Next, we verify that the response was a 302 status code with a Location header pointing to the homepage.
+
+**次にレスポンスでかえってくるステータスコードが302のLocationヘッダーがホームページを指していることを確認しています**
+
+>Last, we request the home page and verify that the link title is visible on the homepage.
+
+**最後に、ホームページをリクエストして、その後ホームページにリンクのタイトルが表示されていることを確認しています。**
+
+
+## **バリデーション失敗時のテスト**
+
+>When a user generally submits bad data, we expect the validation to trigger an exception and we can use that to make sure our validation layer is working:
+
+**ユーザーが一般的に不正なデータを送信すると、バリデーション時に例外が発生するのでこれを使ってバリデーション時の機能が動作しているかを確認する事ができます。**
+
+```php
+/** @test */
+function link_is_not_created_if_validation_fails()
+{
+    $response = $this->post('/submit');
+
+    $response->assertSessionHasErrors(['title', 'url', 'description']);
+}
+```
+
+>We use Laravel’s assertSessionHasErrors() to make sure that the session has validation errors for each of our required fields. Because we submitted empty data to the route, we expect the required rule will trigger for each field.
+
+**Laravelの`assertSessionHasErrors（）`を使用して、セッションに必要な各フィールドに対してバリデーションエラーがあることを確認できます。 なぜなら、ここで行っているテストはルーティングには空のデータが投稿された場合に、各フィールドに対して必須項目のバリデーションで落ちる事を確認しています。**
+
+>Let’s run the test suite to verify our work thus far:
+
+テストが正しく動作するか確認する為にテストコードを実行します。
+
+```
+$ vendor/bin/phpunit
+PHPUnit 6.4.3 by Sebastian Bergmann and contributors.
+
+...                                                                 3 / 3 (100%)
+
+Time: 173 ms, Memory: 16.00MB
+
+OK (3 tests, 10 assertions)
+```
+
+## **URLバリデーション時のテスト**
+
+>We expect only valid URLs to pass validation so that our application doesn’t try to display invalid data.
+
+**ここでは有効なURLのみがバリデーションを通過して、アプリケーション側で無効なデータが表示されない事を期待します。**
+
+```php
+/** @test */
+function link_is_not_created_with_an_invalid_url()
+{
+    $this->withoutExceptionHandling();
+
+    $cases = ['//invalid-url.com', '/invalid-url', 'foo.com'];
+
+    foreach ($cases as $case) {
+        try {
+            $response = $this->post('/submit', [
+                'title' => 'Example Title',
+                'url' => $case,
+                'description' => 'Example description',
+            ]);
+        } catch (ValidationException $e) {
+            $this->assertEquals(
+                'The url format is invalid.',
+                $e->validator->errors()->first('url')
+            );
+            continue;
+        }
+
+        $this->fail("The URL $case passed validation when it should have failed.");
+    }
+}
+```
+
+>Laravel 5.5 introduced the withoutExceptionHandling() method which disables Laravel’s route exception handling code used to generate an HTTP response after an exception. We use this to our advantage so we can inspect the validation exception object and assert against the error messages.
+
+**Laravel5.5から、例外発生後の`HTTP`レスポンスを生成するために、Laravelテスト時の例外処理を無効化する`withoutExceptionHandling（）`メソッドが導入されました。これを使用してバリデーション時の例外オブジェクトを使ってエラーメッセージが正しいかを確認するることができます。**
+
+>We loop through various cases (add your own if you’d like to cover more scenarios) and catch instances of ValidationException. If the text makes it past the exception handling, we manually fail the test because we expect the route throws a ValidationExcepiton exception each time.
+
+**ループしを使ってさまざまなケース(より多くのシナリオをカバーする場合は独自のケースを追加してください）、例外発生時の`ValidationException`のインスタンスをキャッチします。誤ったテキストがpostされ例外処理を過ぎると、そのたびにが`ValidationExcepiton`例外が発生して、手動で落ちるようになっています。**
+
+>The `catch` block uses the validator object to check the `url` error and asserts that the actual error message matches the expected validation error message.
+
+**`catch`ブロック内では、バリデータオブジェクトを使用してURLエラーをチェックし、実際のエラーメッセージが予想される検証エラーメッセージと一致することを確認しています。**
+
+>I like using the try/catch technique, followed by a $this->fail() as a safety harness instead of using exception annotations provided by PHPUnit. I feel catching the exception allows the ability to do assertions that wouldn’t otherwise be possible and provides a more granular control that I like in most cases.
+
+**私は`PHPUnit`が提供する`dataProvider`を使用する代わりに、`try/catch`のテクニックを使用し、その後に落ちた事を確認する方法として、`$this->fai()`を使うのが好きです。**
+
+
+## **MaxLengthバリデーション時のテスト**
+
+>We will test a few scenarios with the max:255 validations rules: when the field fails max-length validation with a length of 256 characters, and when the field is long enough to pass validation at 255 characters.
+
+**`max：255`のバリデーションルールに関するテストをいくつかのシナリオを用意してテストします。フィールドが長さ`256`文字の最大長のバリデーションに失敗し、フィールドが`255`文字の場合はバリデーションが通る事を確認します。**
+
+>Although Laravel contains the max validation rule functionality, I like to test it to verify that my application applies the rules. If someone removes the max validation rule, then the tests will catch it.
+
+**Laravelには`max`バリデーションが含まれていますが、私はアプリケーション側でルールが適用されていることをバリデーションするためのテストしたいと思います。もしも誰かが`max`バリデーションをルールを削除した場合は、テストはその事をキャッチして落ちるでしょう。**
+
+
+>I like to test the threshold of min and max validation rules as an extra caution to make sure my application respects the min and max boundaries I set.
+
+
+**最小と最大のバリデーションルールのしきい値をテストして、アプリケーションが設定した最小値と最大値の境界を担保しているかどうかを確認しましょう。**
+
+>First, let’s test the “max length” scenario:
+
+**まず、「max length」のテストケースです。**
+
+```php
+/** @test */
+function max_length_fails_when_too_long()
+{
+    $this->withoutExceptionHandling();
+
+    $title = str_repeat('a', 256);
+    $description = str_repeat('a', 256);
+    $url = 'http://';
+    $url .= str_repeat('a', 256 - strlen($url));
+
+    try {
+        $this->post('/submit', compact('title', 'url', 'description'));
+    } catch(ValidationException $e) {
+        $this->assertEquals(
+            'The title may not be greater than 255 characters.',
+            $e->validator->errors()->first('title')
+        );
+
+        $this->assertEquals(
+            'The url may not be greater than 255 characters.',
+            $e->validator->errors()->first('url')
+        );
+
+        $this->assertEquals(
+            'The description may not be greater than 255 characters.',
+            $e->validator->errors()->first('description')
+        );
+
+        return;
+    }
+
+    $this->fail('Max length should trigger a ValidationException');
+}
+```
+
+>Again, we disable exception handling and create data that is one character too long to pass validation.
+
+**ここでも`withoutExceptionHandling`でテスト内の例外処理を無効にし、バリデーション成功するには長すぎるデータを作成します。**
+
+>We assert each field to make sure they all have a max length validation error message.
+
+**各フィールドに`max length`のバリデーション時のエラーメッセージがあることを確認するために、各フィールドに対して`assertEquals`で確認しています。**
+
+>Last, we need to return in the caught exception and use the $this->fail() as a safety harness to fail the test.
+
+**最後に、キャッチされた例外から、バリデーションで失敗した事を確認する為に`$this->fail()`を使って確認する必要があります。**
+
+>Next, we test the “under the max” scenario:
+
+**次に、 `max`よりも少ない場合のテストケースです。**
+
+```php
+/** @test */
+function max_length_succeeds_when_under_max()
+{
+    $url = 'http://';
+    $url .= str_repeat('a', 255 - strlen($url));
+
+    $data = [
+        'title' => str_repeat('a', 255),
+        'url' => $url,
+        'description' => str_repeat('a', 255),
+    ];
+
+    $this->post('/submit', $data);
+
+    $this->assertDatabaseHas('links', $data);
+}
+```
+
+>We make the form data long enough to pass max:255 validation and assert that the data is in the database after submitting the data.
+
+**このテストケースでは`max：255`のバリデーションで通る長さのデータを作成して、データを送信した後にデータがデータベースに格納されている事を確認します。**
+
+>Run the test suite and make sure everything is passing:
+
+**テストを実行してすべてのテストケースが通る事を確認してください。**
+
+```sh
+$ vendor/bin/phpunit
+PHPUnit 6.4.3 by Sebastian Bergmann and contributors.
+
+......                                                              6 / 6 (100%)
+
+Time: 197 ms, Memory: 16.00MB
+
+OK (6 tests, 17 assertions)
+```
 
 
 ## **まとめ**
 
 >Congratulations on making it through the tutorial. This guide was designed to get you started on building your app, and you can use this as a building block to you gain the skills you need to build your application. I know this covers a lot of features and can be overwhelming if you are not familiar with the framework.
 
-**チュートリアルを完了したことを祝福します。 このガイドは、アプリケーションの構築を開始するためのもので、これを最初の土台として使用することで、アプリケーションを構築するために必要なスキルを身に付けることができます。 私はこのチュートリアルに多くの機能をカバーしており、フレームワークに精通していないと圧倒されてしまう事を知っています。**
+**チュートリアルを完了したことを祝福しましょう。 このガイドは、アプリケーションの構築を開始するためのもので、これを最初の土台として使用することで、アプリケーションを構築するために必要なスキルを身に付けることができます。 私はこのチュートリアルに多くの機能をカバーしており、フレームワークに精通していないと圧倒されてしまう事を知っています。**
 
 >I hope this introduction to Laravel shows you why so many people are excited about the framework.
 
