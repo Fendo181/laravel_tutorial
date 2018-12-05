@@ -129,7 +129,7 @@ MVCパターンとModel・View・Controllerの略でそれぞれに役割を分�
 .
 ```
 
-laravelでは新しく作成するControllerは`app/controller`ディレクトリ直下に生成されます。Viewファイルは`resources/views`直下に配置します。
+Laravelでは新しく作成するControllerは`app/controller`ディレクトリ直下に生成されます。Viewファイルは`resources/views`直下に配置します。
 
 ではModelはと言うと?ここがLaravelの特徴でもあるのですが、Laravelは`models`に相当するディレクトリがないです。理由は[ここ](https://readouble.com/laravel/5.6/ja/structure.html)に詳細に記載されているのですが、これは意図的に設計されています。なので、最初は戸惑うと思いますが、新しく`Model`を作成した場合は`app`直下に作られる事を覚えておいて下さい。
 
@@ -255,11 +255,15 @@ public function run()
 以下のコマンドでマイグレーションとシードを実行して、テーブルにテストデータを追加します。
 
 
-```php
+```sh
 php artisan migrate --seed
 ```
 
 また`migrate:fresh`を使う事で、一旦tableにあるデータをリセットして、`seeder`で初期値データが入っている状態にする事もできます。
+
+```sh
+php artisan migrate:fresh --seed
+```
 
 [データベース：マイグレーション 5.6 Laravel 全テーブル削除後のマイグレーション](https://readouble.com/laravel/5.6/ja/migrations.html#rolling-back-migrations)
 
@@ -342,7 +346,7 @@ Route::get('/', function () {
 </body>
 ```
 
-ブラウザを更新すると、追加されたすべてのリンクのリストが表示され、先程ModelFactoryとSeedsで生成したテストデータが表示されるのが確認できます。
+ブラウザを更新すると追加されたすべてのリンクのリストが表示され、先程ModelFactoryとSeedsで生成したテストデータが表示されるのが確認できます。
 
 ![リンク.png](https://qiita-image-store.s3.amazonaws.com/0/64829/4991290d-e644-cd66-7fe4-fb2d552990d1.png)
 
@@ -364,7 +368,7 @@ Route::get('/', function () {
 ![laravel_mock.png](https://qiita-image-store.s3.amazonaws.com/0/64829/936e0d41-4504-85ab-caec-8d7952045123.png)
 
 
-まず、`routes/web.php`に新しい投稿フォーム用のルーティングを作成します。**
+まず、`routes/web.php`に新しい投稿フォーム用のルーティングを作成します。
 
 ```php
 Route::get('/submit', function () {
@@ -415,7 +419,9 @@ Route::get('/submit', function () {
 例えばこんな感じに`app.blade.php`を継承した子テンプレート(`default.blade.php`)を用意するとします。
 
 ```default.blade.php
-# 親元のテンプレートを継承する。
+<!-- resources/views/default.blade.phpとして保存 -->
+
+<!-- 親元のテンプレートを継承する。 -->
 @extends('layouts.app')
 
 
@@ -426,7 +432,7 @@ Route::get('/submit', function () {
 @endsection
 ```
 
-この用に定義する事で、子テンプレートは親テンプレートを継承しているので、読み込まれる際は以下のようにコードが置き換えられて、表示されるようになります。
+この用に定義する事で、子テンプレートは親テンプレートを継承しているので読み込まれる際はコードが置き換えられて表示されるようになります。
 
 
 ```html
@@ -444,11 +450,12 @@ Route::get('/submit', function () {
 
 上記のように、子テンプレートは、親テンプレートを継承する事で少ない記述で済み、変更箇所のみテンプレートに書けばいいので、シンプルで分かりやすく、保守しやすいViewファイルが作られるようになっています。
 
-では次の投稿フォームでは`app.blade.php`を継承した、`default.blade.php`を使って作成してみまましょう。
-
 ### 投稿フォームを作成する
 
-親テンプレートは先程作成した`default.blade.php`を使います。
+先程作成した`default.blade.php`を親テンプレートとして使います。
+親テンプレートを継承する際は`@extends`セクションを使ってください。
+
+
 `resources/views/submit.blade.php`に以下のコードを追加して作成して下さい。
 
 
@@ -553,13 +560,37 @@ Route::post('/submit', function (Request $request) {
 });
 ```
 
+これで投稿フォームのバリデーションの準備はできたので、次に送られてきた値を元にデータベースに値を保存する為に、Linkモデルを調整していきます。
+
+Laravelでは既存の機能で、リクエストで送られてきた値を同時に保存する`mass-assigned`を防ぐために、DBに保存する値を`fillable`プロパティで決める事ができます。
+以下のように`fillabl`を使用して保存可能なフィールドを定義します。
+
+```php
+<?php
+
+namespace App;
+
+use Illuminate\Database\Eloquent\Model;
+
+class Link extends Model
+{
+    protected $fillable = [
+        'title',
+        'url',
+        'description'
+    ];
+}
+```
+
+これで、投稿フォームから送られたリンクが新規で作成されるようになります。
+
 ## リファクタリング
 
 ここから先はリファクタリングの話になります。
 私がこれを見たときは真っ先になぜ複雑なバリデーションの処理を`routes/web.php`に責務を追わせているのかと考えました。
 というのは、web.phpはあくまでもルーティング処理を任せて、ここでモデル操作や、バリデーションをするのは、適切ではないと感じたのです。
 
-従ってここでは上のMVCパターンのようContrllerでモデルを操作を行い、Requestでバリデーションを行うようにリファクタリングをしてみます。
+従ってここでは上のMVCパターンのようContrller側でモデルを呼び出しビジネスロジックを担保し、Requestでバリデーションを行うようにリファクタリングをしてみます。
 
 ### バリデーション:LinkRequest
 
@@ -573,7 +604,6 @@ php artisan make:request LinkRequest
 rulesメソッドに先程ルーティンで書いたバリデーションを`rule`メソッドに記述します。
 
 ```php
-
 <?php
 namespace App\Http\Requests;
 use Illuminate\Foundation\Http\FormRequest;
@@ -605,12 +635,10 @@ class LinkRequest extends FormRequest
 ```
 
 気づいたと思いますが検証が失敗した場合の`$validator->fails()`の処理が記述されてないです。
-Laravelはバリデーションで通らなかった場合、自動的にユーザを以前のページヘリダイレクトします。
-付け加えて、バリデーションエラーは全部自動的にフラッシュデータとしてセッションへ保存されます。従って明示的に宣言しなくてみいつでもビューの中で$errors変数が使えます。
+Laravelはバリデーションで通らなかった場合、自動的にユーザを直前にアクセスしたページヘリダイレクトします。
+付け加えて、バリデーションエラーは全て自動的にフラッシュデータとしてセッションへ保存されます。従って明示的に宣言しなくてみいつでもビューの中で`$errors`変数が使えるようになっています。
 
 >- [Laravel 5.6 バリデーション](https://readouble.com/laravel/5.6/ja/validation.html)
-
-
 
 ### モデル操作:LinkController
 
@@ -620,21 +648,18 @@ Laravelはバリデーションで通らなかった場合、自動的にユー�
 php artisan make:controller LinkController
 ```
 
-上でuseで`App\Http\Requests\LinkRequest;`を名前空間として呼び出している事に注意して下さい。
-ここでは新しくsubmitメソッドを作って、先程作成した`LinkRequest`をタイプヒントで指定する事でバリデーションの検証を行う事ができます。検証が通った後はモデル操作を行います。
+`LinkController`が生成されたら以下のよう処置を追加します。
 
 ```php
 <?php
 namespace App\Http\Controllers;
-use Illuminate\Http\Request;
-
-#LinkRequest
+use App\Link;
 use App\Http\Requests\LinkRequest;
 
 class LinkController extends Controller
 {
     public function submit(LinkRequest $request){
-        $link = new \App\Link;
+        $link = new Link();
         $link->title = $request->title;
         $link->url = $request->url;
         $link->description = $request->description;
@@ -643,6 +668,9 @@ class LinkController extends Controller
     }
 }
 ```
+
+useを使って`App\Http\Requests\LinkRequest;`を名前空間として呼び出している事に注意して下さい。
+ここでは新しくsubmitメソッドを作って、先程作成した`LinkRequest`をタイプヒントで指定する事でバリデーションの検証を行う事ができます。検証が通った後はモデル操作を行います。
 
 
 ### ルーティング:web.php
@@ -668,7 +696,5 @@ Route::post('/submit','LinkController@submit');
 ### おわりに
 
 チュートリアルを完了したことを祝福します。
-このガイドは最初にも述べたように、[はじめてのLaravelアプリケーションを構築する為のStep by Step Guide](http://qiita.com/Fendo181/items/55701abc11c205b9c057)を元に、改良したチュートリアル記事です。この記事以外にもチュートリアルを探せば、いくらでも出て来るので、是非このチュートリアルをきっかけに他のLaravelでのアプリケーション開発に興味を持って頂ければ幸いです。
-
-
-
+このガイドは最初にも述べたように、[はじめてのLaravelアプリケーションを構築する為のStep by Step Guide](http://qiita.com/Fendo181/items/55701abc11c205b9c057)を元に、改良したチュートリアル記事です。
+この記事以外にもチュートリアルを探せばいくらでも出て来るので、是非このチュートリアルをきっかけに他のLaravelでのアプリケーション開発に興味を持って頂ければ幸いです。
