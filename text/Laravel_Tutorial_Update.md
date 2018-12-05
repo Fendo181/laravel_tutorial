@@ -19,27 +19,19 @@
 ## 環境構築
 
 まずはLaravelをローカル環境にインスールする作る作業からはじめます。
-プロジェクトをすぐに始める為にLaravelではVagrantのboxで最初から自動で必要なファイルを用意してくれている[Laravel Homestead](https://laravel.com/docs/5.4/homestead)や、Mac向けに用意された[Valet](https://laravel.com/docs/5.4/valet)が用意されています。
+プロジェクトをすぐに始める為にLaravelではVagrantのboxで最初から自動で必要なファイルを用意してくれている[Laravel Homestead](https://laravel.com/docs/5.6/homestead)や、Mac向けに用意された[Valet](https://laravel.com/docs/5.6/valet)が用意されています。
 
->- [Laravel Homestead](https://laravel.com/docs/5.4/homestead)
->- [Valet](https://laravel.com/docs/5.4/valet)
+>- [Laravel Homestead](https://laravel.com/docs/5.6/homestead)
+>- [Valet](https://laravel.com/docs/5.6/valet)
 
-また上記の方法以外にも、Dockerを使った[Laradock](https://github.com/laradock/laradock)という手段もあります。もし、これらの手段を使わないのであればLaravelは以下の要件を満たす環境でなければならない事に注意して下さい。
+また上記の方法以外にも、Dockerを使った[Laradock](https://github.com/laradock/laradock)という手段もあります。
 
-- PHP >= 5.6.4
-- OpenSSL PHP拡張
-- PDO PHP拡張
-- Mbstring PHP拡張
-- Tokenizer PHP拡張
-- XML PHP拡張
-
->- [インストール](https://readouble.com/laravel/5.4/ja/installation.html)
+>- [インストール](https://readouble.com/laravel/5.6/ja/installation.html)
 
 ここではそれぞれの方法での詳細なインスール手順は紹介しませんが、もし不安でしたら以下に手順を書いた記事のリンクを紹介するので迷ったらここを覗いて見てください。
 
-
 >- [Laravel Valetをつかってみた。](http://qiita.com/nkumag/items/3ba39749e5ad59ede1f5)
->- [Laravel Homestead](https://laravel.com/docs/5.4/homestead)
+>- [Laravel Homestead](https://laravel.com/docs/5.6/homestead)
 >- [Laravel開発環境をLaradockで構築する](https://www.tam-tam.co.jp/tipsnote/program/post11885.html)
 
 今回のチュートリアルでは私の開発環境はLaravel Homesteadを選択しての開発を進めていきます。
@@ -62,7 +54,7 @@ cd ~/Sites
 composer global require "laravel/installer"
 ```
 
-_(※既に[LaravelHomStead](https://laravel.com/docs/5.4/homestead)をインスールしているのであればここは既にインスール済みなので飛ばして大丈夫です。)_
+_(※既に[LaravelHomStead](https://laravel.com/docs/5.6/homestead)をインスールしているのであればここは既にインスール済みなので飛ばして大丈夫です。)_
 
 
 次のコマンドを実行してプロジェクトを作成します。
@@ -139,7 +131,7 @@ MVCパターンとModel・View・Controllerの略でそれぞれに役割を分�
 
 laravelでは新しく作成するControllerは`app/controller`ディレクトリ直下に生成されます。Viewファイルは`resources/views`直下に配置します。
 
-ではModelはと言うと?ここがLaravelの特徴でもあるのですが、Laravelは`models`に相当するディレクトリがないです。理由は[ここ](https://readouble.com/laravel/5.4/ja/structure.html)に詳細に記載されているのですが、これは意図的に設計されています。なので、最初は戸惑うと思いますが、新しく`Model`を作成した場合は`app`直下に作られる事を覚えておいて下さい。
+ではModelはと言うと?ここがLaravelの特徴でもあるのですが、Laravelは`models`に相当するディレクトリがないです。理由は[ここ](https://readouble.com/laravel/5.6/ja/structure.html)に詳細に記載されているのですが、これは意図的に設計されています。なので、最初は戸惑うと思いますが、新しく`Model`を作成した場合は`app`直下に作られる事を覚えておいて下さい。
 
 
 ## Linkモデルを作成する。
@@ -149,7 +141,6 @@ DBを操作する為のLinkモデルが必要になります。以下のコマ�
 ```
 php artisan make:model Link
 ```
-
 
 
 ## テストデータの作成
@@ -214,7 +205,6 @@ $factory->define(App\Link::class, function (Faker\Generator $faker) {
 ```
 
 
-
 次に、テストデータをテーブルに簡単に追加できるようにLinksTableSeederを作成します。
 
 
@@ -243,8 +233,8 @@ DatabaseSeeder.phpを開き、runメソッドに追加します。
 ```php
 public function run()
 {
-　    $this->call(LinksTableSeeder::class);
-    }
+    $this->call(LinksTableSeeder::class);
+}
 ```
 
 これでテストデータを10人分用意する事ができました。
@@ -303,8 +293,8 @@ Route::get('/', function () {
 <div class="content">
   <div class="title m-b-md">
     Laravel
-  <div class="title m-b-md">        
-@foreach ($links as $link) 
+  <div class="title m-b-md">
+@foreach ($links as $link)
   <li>{{ $link->title }}</li>
 @endforeach
 ```
@@ -333,7 +323,7 @@ Route::get('/', function () {
 
 
 まず、`routes / web.php`ファイルに新しいルーティングを作成します。**
- 
+
 ```php
 Route::get('/submit', function () {
     return view('submit');
@@ -453,7 +443,7 @@ Route::get('/submit', function () {
 ```
 
 `localhost:8000/submit`にアクセスして以下のフォーム画面が表示される事を確認して下さい。
- 
+
 ![form.png](https://qiita-image-store.s3.amazonaws.com/0/64829/46dba030-3aac-0056-e07d-4a26a019bcb6.png)
 
 
@@ -493,7 +483,7 @@ use Illuminate\Http\Request;
 
 ```
 ①POSTで/submitにアクセスする。
-②バリデーションチェック
+②バリデーション
 ③バリデーションでエラーが発生した場合、、セッションにエラーメッセージをフラッシュデータとして保存して元のページへリダイレクトさせます。
 ④バリデーションの検証が通ったらLinkモデルを操作してフォームに投稿されたデータをDBに保存する。
 ⑤その後に/(root)にリダイレクトさせる。
@@ -504,11 +494,11 @@ use Illuminate\Http\Request;
 
 ```php
 use Illuminate\Http\Request;
- 
+
  // ①POSTで/submitにアクセスする。
  Route::post('/submit', function(Request $request) {
-     
-    // ②バリデーションチェック 
+
+    // ②バリデーション
     $validator = Validator::make($request->all(), [
         'title' => 'required|max:255',
         'url' => 'required|max:255|url',
@@ -534,10 +524,10 @@ use Illuminate\Http\Request;
 ## リファクタリング
 
 ここから先はリファクタリングの話になります。
-私がこれを見たときは真っ先になぜ複雑な処理を`routes/web.php`に責務を追わせているのかと考えました。
-というのは、web.phpはあくまでもルーティング処理を任せて、ここでモデル操作や、バリデーションチェックをするのは、適切ではないと感じたのです。
+私がこれを見たときは真っ先になぜ複雑なバリデーションの処理を`routes/web.php`に責務を追わせているのかと考えました。
+というのは、web.phpはあくまでもルーティング処理を任せて、ここでモデル操作や、バリデーションをするのは、適切ではないと感じたのです。
 
-従ってここでは上のMVCパターンのようContrllerでモデルを操作を行い、Requestでバリデーションチェックを行うようにリファクタリングをしてみます。
+従ってここでは上のMVCパターンのようContrllerでモデルを操作を行い、Requestでバリデーションを行うようにリファクタリングをしてみます。
 
 ### バリデーション:LinkRequest
 
@@ -586,7 +576,7 @@ class LinkRequest extends FormRequest
 Laravelはバリデーションで通らなかった場合、自動的にユーザを以前のページヘリダイレクトします。
 付け加えて、バリデーションエラーは全部自動的にフラッシュデータとしてセッションへ保存されます。従って明示的に宣言しなくてみいつでもビューの中で$errors変数が使えます。
 
->- [Laravel 5.4 バリデーション](https://readouble.com/laravel/5.4/ja/validation.html)
+>- [Laravel 5.6 バリデーション](https://readouble.com/laravel/5.6/ja/validation.html)
 
 
 
@@ -606,7 +596,7 @@ php artisan make:controller LinkController
 namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 
-#LinkRequest 
+#LinkRequest
 use App\Http\Requests\LinkRequest;
 
 class LinkController extends Controller
@@ -639,19 +629,13 @@ Route::post('/submit','LinkController@submit');
 これで以前よりも随分簡潔になりました
 今回のケースの場合はアクションが`submit`のみなので、リファクタリングする前のように、ルーティングファイル一箇所で処理をまとめる考えも間違ってはないのですが、今後リンクを消したり、編集したり等のCRUD操作を導入するとなると、ルーティングファイルが肥大化して可読性が下がってしまいます。
 
-ここではControllerとRequestで処理をぶんりさせる手法を見せましたが、Laravelを知れば知る程、このように関心の分離が容易に実現できる事に魅力を感じてくると思います。是非興味があれば、Laravelの醍醐味であるDIコンテナについて調べると良いでしょう。
+ここではControllerとRequestで処理を分離させる手法を見せましたが、Laravelを知れば知る程、このように関心の分離が容易に実現できる事に魅力を感じてくると思います。是非興味があれば、Laravelの醍醐味であるDIコンテナについて調べると良いでしょう。
 
 >- [ララ帳:DIコンテナについての素晴らしい解説記事](https://laravel10.wordpress.com/tag/di/)
 
-
-## テスト
-
-後日公開
-
-
 ### おわりに
 
-チュートリアルを完了したことを祝福します。 
+チュートリアルを完了したことを祝福します。
 このガイドは最初にも述べたように、[はじめてのLaravelアプリケーションを構築する為のStep by Step Guide](http://qiita.com/Fendo181/items/55701abc11c205b9c057)を元に、改良したチュートリアル記事です。この記事以外にもチュートリアルを探せば、いくらでも出て来るので、是非このチュートリアルをきっかけに他のLaravelでのアプリケーション開発に興味を持って頂ければ幸いです。
 
 
