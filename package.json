@@ -18,5 +18,9 @@
         "laravel-mix": "^2.0",
         "lodash": "^4.17.4",
         "vue": "^2.5.7"
+    },
+    "dependencies": {
+        "textlint": "^10.2.1",
+        "textlint-rule-preset-ja-technical-writing": "^2.0.0"
     }
 }
