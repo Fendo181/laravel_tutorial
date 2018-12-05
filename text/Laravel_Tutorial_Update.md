@@ -13,7 +13,7 @@
 - **4.検証が通ったらデータをデータベースに保存します。**
 
 
-このような簡単なwebアプリケーションをこのチュートリアルでは一つ一つ機能を紹介しながら説明していきます。しかし私がこのチュートリアルで一番に掲げる目的は、**今まさにフレームワークを勉強し始めた人たちのためのガイドを作ることです**。従って、Laravelの高度な機能や説明に関してはこのチュートリアルでは詳細に紹介しません。あくまでも、このチュートリアルはLaravelを始めるきっかけの1つとして作りました。
+このような簡単なwebアプリケーションをこのチュートリアルでは1つ1つ機能を紹介しながら説明していきます。しかし私がこのチュートリアルで一番に掲げる目的は、**今まさにフレームワークを勉強し始めた人たちのためのガイドを作ることです**。従って、Laravelの高度な機能や説明に関してはこのチュートリアルでは詳細に紹介しません。あくまでも、このチュートリアルはLaravelを始めるきっかけの1つとして作りました。
 
 
 ## 環境構築
@@ -78,7 +78,7 @@ localhost:8000
 
 ## MVCパターン
 
-リンクリストを作成する前に私は、ここで一つMVCに関する簡単な講義を始めようと思います。何故、いきなりMVCについて説明をするかというと、今回のチュートリアルで作るLinkアプリケーション自体が最終的にMVCパターンの沿って実装されるからです。従って最初にこの概念が無い人にとっては、理解が難しくなってしまうので、ここでは軽くMVCパターンについて説明します。
+リンクリストを作成する前に私は、ここで1つMVCに関する簡単な講義を始めようと思います。何故、いきなりMVCについて説明をするかというと、今回のチュートリアルで作るLinkアプリケーション自体が最終的にMVCパターンの沿って実装されるからです。従って最初にこの概念が無い人にとっては、理解が難しくなってしまうので、ここでは軽くMVCパターンについて説明します。
 
 ![image.png](https://qiita-image-store.s3.amazonaws.com/0/64829/54aa0085-e4a6-dd3d-cdb7-34897735c494.png)
 [参考:[初めてのLARAVEL 5.1 : (14) MVC](https://laravel10.wordpress.com/2015/03/06/%E5%88%9D%E3%82%81%E3%81%A6%E3%81%AElaravel-5-14-mvc/)]
@@ -584,6 +584,7 @@ class Link extends Model
 
 これで、投稿フォームから送られたリンクが新規で作成されるようになります。
 
+
 ## リファクタリング
 
 ここから先はリファクタリングの話になります。
@@ -687,11 +688,276 @@ Route::post('/submit','LinkController@submit');
 ```
 
 これで以前よりも随分簡潔になりました
-今回のケースの場合はアクションが`submit`のみなので、リファクタリングする前のように、ルーティングファイル一箇所で処理をまとめる考えも間違ってはないのですが、今後リンクを消したり、編集したり等のCRUD操作を導入するとなると、ルーティングファイルが肥大化して可読性が下がってしまいます。
+今回のケースの場合はアクションが`submit`のみなので、リファクタリングする前ではルーティングで全ての処理をまとめる考えも間違ってはないのですが、今後リンクを消したり、編集したり等のCRUD操作を導入するとなるとルーティングファイルが肥大化して可読性が下がってしまいます。
 
-ここではControllerとRequestで処理を分離させる手法を見せましたが、Laravelを知れば知る程、このように関心の分離が容易に実現できる事に魅力を感じてくると思います。是非興味があれば、Laravelの醍醐味であるDIコンテナについて調べると良いでしょう。
+なので今回のように、ControllerとRequestで処理を分離させる手法を見せましたが、Laravelを知れば知る程このように関心の分離が容易に実現できる事に魅力を感じてくると思います。　　
+是非興味があれば、Laravelの醍醐味であるDIコンテナについて調べると良いでしょう。
 
 >- [ララ帳:DIコンテナについての素晴らしい解説記事](https://laravel10.wordpress.com/tag/di/)
+
+## 投稿フォームのテスト
+
+投稿フォームが完成しバリデーションも追加したので、ここで投稿フォームでのバリデーションが正しく動作する事を担保するFeatureテストを追加しましょう。
+Laravelでは標準で`phpunit`が入っているので、普段PHPのアプリケーションで書いてる時と同じ要領でテストが実行できます。
+
+最初にデフォルトで存在するテストファイルを削除します。
+
+```sh
+rm tests/Feature/ExampleTest.php
+```
+
+次に以下のコマンドを実行して、新しく投稿フォーム用のテストファイルを生成します。
+
+```sh
+php artisan make:test SubmitLinksTes
+```
+
+生成されたテストファイルに以下のように予め今回テストするテストケースを追加します。
+
+```php
+<?php
+
+namespace Tests\Feature;
+
+use Tests\TestCase;
+use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+
+class SubmitLinkTest extends TestCase
+{
+    /** @test */
+    function guest_can_submit_a_new_link() {}
+
+    /** @test */
+    function link_is_not_created_if_validation_fails() {}
+
+    /** @test */
+    function link_is_not_created_with_an_invalid_url() {}
+
+    /** @test */
+    function max_length_fails_when_too_long() {}
+
+    /** @test */
+    function max_length_succeeds_when_under_max() {}
+}
+```
+これらのテストこれから記述していくテストコードの概要を示してます。
+
+- 1.有効なリンクがデータベースに保存されることを確認する
+- 2.バリデーションに失敗すると、リンクはデータベースに保存されない
+- 3.有効でないリンクはバリデーションで失敗する
+- 4.フィールドに入力された文字がmax:255よりも長い場合は失敗する
+- 5.フィールドに入力された文字がmax:255より少ない場合は成功する
+-
+では1つ1つのテストケースを通していきましょう。
+
+
+### 有効なリンクは保存できる
+
+最初に行うテストでは有効なリンクがデータベースに保存されることを確認するテストを実行します
+
+
+```php
+<?php
+
+namespace Tests\Feature;
+
+use Illuminate\Validation\ValidationException;
+use Tests\TestCase;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+
+class SubmitLinksTest extends TestCase
+{
+    use RefreshDatabase;
+
+    /** @test */
+    function guest_can_submit_a_new_link()
+    {
+        $response = $this->post('/submit', [
+            'title' => 'Example Title',
+            'url' => 'http://example.com',
+            'description' => 'Example description.',
+        ]);
+
+        $this->assertDatabaseHas('links', [
+            'title' => 'Example Title'
+        ]);
+
+        $response
+            ->assertStatus(302)
+            ->assertHeader('Location', url('/'));
+
+        $this
+            ->get('/')
+            ->assertSee('Example Title');
+    }
+}
+```
+
+`RefreshDatabase`トレイトを使う事でテスト後にデータベースをリセットできる為、テストデータに影響を及ぼさないようにする事が可能です。
+ここでは最初のテストで`$this->post`を使って、有効なデータを`/submit`でpostした際に、レスポンスで帰ってくるオブジェクト(`$response`)を使ってルーティングが期待どおりになっているかを確認しています。
+
+`assertDatabaseHas`は指定したカラムに該当するデータが存在しているかを確認しています。
+
+次に、`assertStatus`を使って返ってくるレスポンスのでステータスコードが正しいかを確認しています。
+`302`なので、正常にリダイレクトされている事を期待しています。
+最後に、`assertSee`を使ってホームページをリクエストして、その後ホームページにリンクのタイトルが表示されていることを確認しています。
+
+この状態でまずはテストを実行してみます。
+
+```sh
+$./vendor/bin/phpunit ./tests/Feature/SubmitLinkTest.php
+
+.                                1 /1 (100%)
+
+Time: 146 ms, Memory: 16.00MB
+
+OK (1 test, 5 assertions)
+```
+
+こんな感じでテストを実行していきます。
+このテストケースでは投稿フォームで送信されたリンクが正しくデータベースに保存されて、リダイレクトされる事がわかったので、次のテストケースに進みます。
+
+### バリデーション失敗時のテスト
+
+ユーザーが一般的に不正なデータを送信すると、バリデーション時に例外が発生するのでこれを使ってバリデーション時の機能が動作しているかを確認する事ができます。
+
+```php
+/** @test */
+function link_is_not_created_if_validation_fails()
+{
+    $response = $this->post('/submit');
+
+    $response->assertSessionHasErrors(['title', 'url', 'description']);
+}
+```
+
+`assertSessionHasErrors`を使用して各フィールドに対してバリデーションエラーがあることを確認します。
+ここで行っているテストはルーティングには空のデータが投稿された場合の為、各フィールドに対して必須項目のバリデーションで落ちる事を確認できます。
+
+### URLバリデーション時のテスト
+
+ここのテストケースでは有効なURLのみがバリデーションを通過して、アプリケーション側で無効なデータが表示されない事を期待します。
+
+```php
+/** @test */
+function link_is_not_created_with_an_invalid_url()
+{
+    $this->withoutExceptionHandling();
+
+    $cases = ['//invalid-url.com', '/invalid-url', 'foo.com'];
+
+    foreach ($cases as $case) {
+        try {
+            $response = $this->post('/submit', [
+                'title' => 'Example Title',
+                'url' => $case,
+                'description' => 'Example description',
+            ]);
+        } catch (ValidationException $e) {
+            $this->assertEquals(
+                'The url format is invalid.',
+                $e->validator->errors()->first('url')
+            );
+            continue;
+        }
+
+        $this->fail("The URL $case passed validation when it should have failed.");
+    }
+}
+```
+
+`withoutExceptionHandling()`に注目してください。
+これを追加する事で、Laravle側でHTTPレスポンスを生成する際の例外処理が原因で、それ以降のテストが実行できないのを防ぐ事ができます。
+
+ここでは`foreach`を使って使ってさまざまなケースを試しています。
+誤ったテキストがpostされると、そのたびに`ValidationExcepiton`例外が発生して手動で落ちるようになっています。
+
+エラーが発生した場合は、`assertEquals`を使って表示されるエラーメッセージが期待しているものと一致しているかを確認しています。
+
+### MaxLengthバリデーション時のテスト
+
+次に `max：255`のバリデーションルールに関するテストケースを用意して、期待通りに動作するか確認します。
+フィールドが長さ `256`文字の最大長の場合はバリデーションに失敗し、フィールドが`255`文字以下の場合はバリデーションが通る事を確認します。
+最小と最大のバリデーションルールのしきい値をテストして、アプリケーションが設定した最小値と最大の境界を担保しているかどうかをテストケースで実装していきます。
+
+```php
+/** @test */
+function max_length_fails_when_too_long()
+{
+    $this->withoutExceptionHandling();
+
+    $title = str_repeat('a', 256);
+    $description = str_repeat('a', 256);
+    $url = 'http://';
+    $url .= str_repeat('a', 256 - strlen($url));
+
+    try {
+        $this->post('/submit', compact('title', 'url', 'description'));
+    } catch(ValidationException $e) {
+        $this->assertEquals(
+            'The title may not be greater than 255 characters.',
+            $e->validator->errors()->first('title')
+        );
+
+        $this->assertEquals(
+            'The url may not be greater than 255 characters.',
+            $e->validator->errors()->first('url')
+        );
+
+        $this->assertEquals(
+            'The description may not be greater than 255 characters.',
+            $e->validator->errors()->first('description')
+        );xw
+        return;
+    }
+
+    $this->fail('Max length should trigger a ValidationException');
+}
+```
+
+各フィールドに`max length`のバリデーション時のエラーメッセージがあることを確認するために、各フィールドに対して`assertEquals`を使って確認しています。
+最後に例外処理が発生した事を`$this->fail()`を使って確認します。
+
+次に`max length`よりも少ない場合のテストケースを作成します。
+
+```php
+/** @test */
+function max_length_succeeds_when_under_max()
+{
+    $url = 'http://';
+    $url .= str_repeat('a', 255 - strlen($url));
+
+    $data = [
+        'title' => str_repeat('a', 255),
+        'url' => $url,
+        'description' => str_repeat('a', 255),
+    ];
+
+    $this->post('/submit', $data);
+
+    $this->assertDatabaseHas('links', $data);
+}
+```
+
+このテストケースでは`max：255`バリデーションで通る長さのデータを作成して、データを送信した後にデータがデータベースに格納されている事を確認します。
+
+最後にこれらの作成したテストを実行して結果を確認します。
+
+```php
+$./vendor/bin/phpunit ./tests/Feature/SubmitLinkTest.php
+PHPUnit 7.4.5 by Sebastian Bergmannand contributors.
+
+.....                                5 /5 (100%)
+
+Time: 176 ms, Memory: 16.00MB
+
+OK (5 tests, 16 assertions)
+```
+
+お疲れ様です。
+以上で投稿フォームを担保するテストコードを追加する作業は終わりです。
+
 
 ### おわりに
 
