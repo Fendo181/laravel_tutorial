@@ -1,10 +1,10 @@
-@extends('layouts.app')
+@extends('default')
 
 @section('content')
     <div class="container">
         <div>
             <h1>Submit a Link </h1>
-            <form action="/submit" method="post" class="needs-validation" novalidate>
+            <form action="/submit" method="post" >
                 @if ($errors->any())
                     <div class="alert alert-danger" role="alert">
                         Plese fix the following errors
@@ -15,10 +15,9 @@
 
                 <div class="form-group{{ $errors->has('title') ? 'has-error' : ''}}">
                     <label for="title">Title</label>
-                    <label for="title">Title</label>
                     <input type="text" class="form-control" id="title" name="title" placeholder="Title" value="{{ old('title') }}">
                     @if($errors->has('title'))
-                        <div class="invalid-feedback">
+                        <div class="alert alert-danger">
                             {{ $errors->first('title') }}
                         </div>
                     @endif
@@ -29,7 +28,7 @@
                     <input type="text" class="form-control" id="url" name="url" placeholder="URL" value="{{ old('url') }}">
                     @if($errors->has('url'))
                         <span>
-                            <div class="invalid-feedback">
+                            <div class="alert alert-danger">
                                 {{ $errors->first('url') }}
                             </div>
                         </span>
@@ -40,7 +39,7 @@
                     <label for="description">Description</label>
                     <textarea class="form-control" id="description" name="description" placeholder="description">{{ old('description') }}</textarea>
                     @if($errors->has('description'))
-                        <div class="invalid-feedback">
+                        <div class="alert alert-danger">
                         {{ $errors->first('description') }}
                         </div>
                     @endif
