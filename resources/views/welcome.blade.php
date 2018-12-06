@@ -91,7 +91,7 @@
 
                 {{-- comment here --}}
                 <div class="comment">
-                    <a href="./submit">cooment here</a>
+                    <a href="./submit">Add Link</a>
                 </div>
             </div>
         </div>
