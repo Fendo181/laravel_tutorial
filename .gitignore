@@ -13,5 +13,5 @@ yarn-error.log
 .env
 .commit_template
 composer.lock
-
+package-lock.json
 
